@@ -5,6 +5,7 @@
 #include <string.h>
 #include <printf.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "lexer.h"
 
 static struct {
@@ -15,11 +16,82 @@ void lexer_set_var(char var) {
 	m_lexer.var = var;
 }
 
-int str_match_partial(const char *in, const char *match, size_t in_len, size_t match_len) {
+typedef enum {
+	STR_MATCH_NO_MATCH,
+	STR_MATCH_PARTIAL_MATCH,
+	STR_MATCH_FULL_MATCH,
+} str_match_partial_ret_t;
+
+static str_match_partial_ret_t str_match_partial(const char *in, const char *match, size_t in_len, size_t match_len) {
 	if (in_len > match_len) {
-		return 1;
+		return STR_MATCH_NO_MATCH;
 	}
-	return strncmp(in, match, match_len);
+	if (strncmp(in, match, match_len) == 0) {
+		return STR_MATCH_FULL_MATCH;
+	}
+	return strncmp(in, match, in_len) == 0 ? STR_MATCH_PARTIAL_MATCH : STR_MATCH_NO_MATCH;
+}
+
+typedef enum {
+	PARSE_NUMBER_STATE_SIGN_OPT,
+	PARSE_NUMBER_STATE_DIGIT_REQ,
+	PARSE_NUMBER_STATE_DIGITS,
+	PARSE_NUMBER_STATE_DECIMAL_REQ,
+	PARSE_NUMBER_STATE_DECIMAL,
+} parse_number_state_t;
+
+static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len, bool sign) {
+	parse_number_state_t state = sign ? PARSE_NUMBER_STATE_SIGN_OPT : PARSE_NUMBER_STATE_DIGIT_REQ;
+
+	int pos = 0;
+	while (pos < buf_len) {
+		switch (state) {
+			case PARSE_NUMBER_STATE_SIGN_OPT:
+				if (buf[pos] == '-') {
+					state = PARSE_NUMBER_STATE_DIGIT_REQ;
+				} else if (buf[pos] == '+') {
+					state = PARSE_NUMBER_STATE_DIGIT_REQ;
+				} else if (buf[pos] >= '0' && buf[pos] <= '9') {
+					state = PARSE_NUMBER_STATE_DIGITS;
+				} else {
+					return STR_MATCH_NO_MATCH;
+				}
+				break;
+			case PARSE_NUMBER_STATE_DIGIT_REQ:
+				if (buf[pos] >= '0' && buf[pos] <= '9') {
+					state = PARSE_NUMBER_STATE_DIGITS;
+				} else {
+					return STR_MATCH_NO_MATCH;
+				}
+				break;
+			case PARSE_NUMBER_STATE_DIGITS:
+				if (buf[pos] >= '0' && buf[pos] <= '9') {
+					state = PARSE_NUMBER_STATE_DIGITS;
+				} else if (buf[pos] == '.') {
+					state = PARSE_NUMBER_STATE_DECIMAL_REQ;
+				} else {
+					return STR_MATCH_NO_MATCH;
+				}
+				break;
+			case PARSE_NUMBER_STATE_DECIMAL_REQ:
+			case PARSE_NUMBER_STATE_DECIMAL:
+				if (buf[pos] >= '0' && buf[pos] <= '9') {
+					state = PARSE_NUMBER_STATE_DECIMAL;
+				} else {
+					return STR_MATCH_NO_MATCH;
+				}
+				break;
+			default:
+				return STR_MATCH_NO_MATCH;
+		}
+		pos++;
+	}
+
+	if (state == PARSE_NUMBER_STATE_DIGIT_REQ || state == PARSE_NUMBER_STATE_DECIMAL_REQ) {
+		return STR_MATCH_PARTIAL_MATCH;
+	}
+
+	return STR_MATCH_FULL_MATCH;
 }
 
 retval_t lexer_lex(const char *input, token_t *tokens) {
@@ -28,42 +100,64 @@ retval_t lexer_lex(const char *input, token_t *tokens) {
 	char buf[512];
 	int buf_pos = 0;
 	size_t input_len = strlen(input);
-	token_type_t latest_token_type = TOKEN_TYPE_UNKNOWN;
+	token_t latest_token;
+	str_match_partial_ret_t best_match = STR_MATCH_NO_MATCH;
+	bool start_of_expression = true;
 
 	for (; input_pos < input_len; input_pos++) {
+		str_match_partial_ret_t match;
+
 		// look ahead
 		buf[buf_pos++] = input[input_pos];
 
 		// check str repr
 		int num_matches = 0;
 		for (int i = 0; i < TOKEN_TYPE_COUNT; i++) {
-			if (str_match_partial(buf, token_str_repr_map[i], buf_pos, strlen(token_str_repr_map[i])) == 0) {
+			match = str_match_partial(buf, token_str_repr_map[i], buf_pos, strlen(token_str_repr_map[i]));
+			if (match > STR_MATCH_NO_MATCH) {
 				num_matches++;
-				latest_token_type = i;
+			}
+			if (match > best_match) {
+				latest_token.type = i;
+				best_match = match;
 			}
 		}
 		// check var
-		if (str_match_partial(buf, &m_lexer.var, buf_pos, 1) == 0) {
+		match = str_match_partial(buf, &m_lexer.var, buf_pos, 1);
+		if (match > STR_MATCH_NO_MATCH) {
 			num_matches++;
-			latest_token_type = TOKEN_TYPE_VAR;
 		}
-		// check num (float)
-		float num = strtof(buf, NULL);
-		if (num != 0.0) {
-			printf("got number %s\n", buf);
+		if (match > best_match) {
+			latest_token.type = TOKEN_TYPE_VAR;
+			best_match = match;
+		}
+		// check number
+		match = is_string_number(buf, buf_pos, start_of_expression);
+		if (match > STR_MATCH_NO_MATCH) {
 			num_matches++;
-			latest_token_type = TOKEN_TYPE_NUM;
+		}
+		if (match > best_match) {
+			float num = strtof(buf, NULL);
+			num_matches++;
+			latest_token.type = TOKEN_TYPE_NUM;
+			latest_token.value_type = TOKEN_VALUE_TYPE_NUMBER;
+			latest_token.value.number = num;
 		}
 
 		if (num_matches == 0 || input_pos == input_len - 1) {
-			if (latest_token_type != TOKEN_TYPE_UNKNOWN) {
+			if (latest_token.type != TOKEN_TYPE_UNKNOWN) {
 				// add token
-				tokens[token_count].type = latest_token_type;
+				memcpy(&tokens[token_count], &latest_token, sizeof(token_t));
 				token_count++;
 
-				// reset buffer
+				// reset
 				buf_pos = 0;
-				latest_token_type = TOKEN_TYPE_UNKNOWN;
+				latest_token.type = TOKEN_TYPE_UNKNOWN;
+				latest_token.value_type = TOKEN_VALUE_TYPE_NONE;
+				best_match = STR_MATCH_NO_MATCH;
+
+				start_of_expression = false;
+				// check for start of expression tokens like opening parenthesis
 
 				// push back
 				if (num_matches != 0 && input_pos == input_len - 1) {
