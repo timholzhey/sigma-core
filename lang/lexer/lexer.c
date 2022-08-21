@@ -7,9 +7,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "lexer.h"
+#include "logging.h"
 
 static struct {
 	char var;
+	lexer_error_t error;
 } m_lexer;
 
 void lexer_set_var(char var) {
@@ -39,6 +41,12 @@ typedef enum {
 	PARSE_NUMBER_STATE_DECIMAL_REQ,
 	PARSE_NUMBER_STATE_DECIMAL,
 } parse_number_state_t;
+
+#define LEXER_FAIL_WITH_MSG(...) { \
+	log_error_noterm("Lexer failed with error: "); \
+	log_error(__VA_ARGS__); \
+	return RETVAL_ERROR; \
+}
 
 static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len, bool sign) {
 	parse_number_state_t state = sign ? PARSE_NUMBER_STATE_SIGN_OPT : PARSE_NUMBER_STATE_DIGIT_REQ;
@@ -95,6 +103,8 @@ static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len,
 }
 
 retval_t lexer_lex(const char *input, token_t *tokens) {
+	m_lexer.error = LEXER_ERROR_OK;
+
 	int input_pos = 0;
 	int token_count = 0;
 	char buf[512];
@@ -166,9 +176,8 @@ retval_t lexer_lex(const char *input, token_t *tokens) {
 				input_pos--;
 				continue;
 			} else {
-				// error
-				printf("error: unknown token '%c'\n", input[input_pos]);
-				return RETVAL_ERROR;
+				m_lexer.error = LEXER_ERROR_UNKNOWN_TOKEN;
+				LEXER_FAIL_WITH_MSG("Unknown token '%c'", input[input_pos]);
 			}
 		}
 	}
@@ -181,4 +190,8 @@ retval_t lexer_lex(const char *input, token_t *tokens) {
 	printf("\n");
 
 	return RETVAL_OK;
+}
+
+lexer_error_t lexer_errno() {
+	return m_lexer.error;
 }

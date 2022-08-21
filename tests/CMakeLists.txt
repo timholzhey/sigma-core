@@ -1,0 +1,10 @@
+add_executable(
+        run_tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_lexer.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_parser.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/testlib.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/lexer/lexer.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/lang_def.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser/parser.c
+)
