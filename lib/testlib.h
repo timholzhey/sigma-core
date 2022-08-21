@@ -71,8 +71,14 @@
 		TEST_ERROR_WITH_MSG("Expected false, got true"); \
 	}
 
-#define TEST_ASSERT_EQ(a, b) TEST_ASSERT((a) == (b))
-#define TEST_EXPECT_EQ(a, b) TEST_EXPECT((a) == (b))
+#define TEST_ASSERT_EQ(a, b) \
+	if ((a) != (b)) { \
+		TEST_FAIL_WITH_MSG("Expected %d, got %d", (a), (b)); \
+	}
+#define TEST_EXPECT_EQ(a, b) \
+	if ((a) != (b)) { \
+		TEST_ERROR_WITH_MSG("Expected %d, got %d", (a), (b)); \
+	}
 
 #define TEST_ASSERT_EQ_U8(a, b) \
 	if ((a) != (b)) { \
@@ -247,7 +253,7 @@
 	return return_value;
 
 #define log_error(message, ...) \
-    if (LOG_LEVEL >= LOG_LEVEL_SUCCESS) { \
+    if (LOG_LEVEL >= LOG_LEVEL_ERROR) { \
 		printf("\033[0;31m" message "\033[0m\n", ##__VA_ARGS__); \
 	}
 #define log_success(message, ...) \
@@ -275,7 +281,7 @@
 		printf("\033[0;37m" message "\033[0m\n", ##__VA_ARGS__); \
 	}
 #define log_raw_error(message, ...) \
-    if (LOG_LEVEL >= LOG_LEVEL_SUCCESS) { \
+    if (LOG_LEVEL >= LOG_LEVEL_ERROR) { \
 		printf("\033[0;31m" message "\033[0m", ##__VA_ARGS__); \
 	}
 #define log_raw_success(message, ...) \

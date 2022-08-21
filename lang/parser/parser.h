@@ -12,8 +12,12 @@ retval_t parser_parse(token_t *tokens, int num_tokens, ast_node_t *ast);
 typedef enum {
 	PARSER_ERROR_OK,
 	PARSER_ERROR_TOKENS_NULL,
+	PARSER_ERROR_AST_NULL,
 	PARSER_ERROR_NO_TOKENS,
 	PARSER_ERROR_MALLOC,
+	PARSER_ERROR_UNEXPECTED_TOKEN,
+	PARSER_ERROR_SURROUNDING_MISMATCH,
+	PARSER_ERROR_UNCLOSED_SCOPE,
 } parser_error_t;
 
 parser_error_t parser_errno();

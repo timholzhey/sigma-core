@@ -65,7 +65,7 @@ typedef enum {
 #define TOKEN_FLAG_NONE			0x00
 #define TOKEN_FLAG_PREFIX		0x01
 #define TOKEN_FLAG_INFIX		0x02
-#define TOKEN_FLAG_SUFFIX		0x04
+#define TOKEN_FLAG_POSTFIX		0x04
 #define TOKEN_FLAG_SURROUND		0x08
 #define TOKEN_FLAG_BEGIN_SCOPE	0x10
 #define TOKEN_FLAG_END_SCOPE	0x20
@@ -74,11 +74,11 @@ extern const char *token_str_repr_map[TOKEN_TYPE_COUNT];
 extern const uint32_t token_flags_map[TOKEN_TYPE_COUNT];
 extern const char *token_type_name_map[TOKEN_TYPE_COUNT];
 
-struct ast_node_t;
-typedef struct {
+struct ast_node_t {
 	struct ast_node_t *left;
 	struct ast_node_t *right;
 	token_t token;
-} ast_node_t;
+};
+typedef struct ast_node_t ast_node_t;
 
 #endif //SIGMA_CORE_LANG_DEF_H
