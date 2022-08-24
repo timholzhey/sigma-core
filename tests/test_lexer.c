@@ -9,8 +9,9 @@ TEST_DEF(test_lexer, simple) {
 	const char *input = "1.5*x^2-3!";
 	token_t tokens[1000];
 	lexer_set_var('x');
+	int num_tokens = 0;
 
-	retval_t ret = lexer_lex(input, tokens);
+	retval_t ret = lexer_lex(input, tokens, &num_tokens, 1000);
 	lexer_error_t err = lexer_errno();
 
 	token_type_t expect_token_types[] = {TOKEN_TYPE_NUM, TOKEN_TYPE_OPERATOR_MUL, TOKEN_TYPE_VAR,
@@ -29,8 +30,9 @@ TEST_DEF(test_lexer, simple) {
 TEST_DEF(test_lexer, unknown_token) {
 	const char *input = "1+u";
 	token_t tokens[1000];
+	int num_tokens = 0;
 
-	retval_t ret = lexer_lex(input, tokens);
+	retval_t ret = lexer_lex(input, tokens, &num_tokens, 1000);
 	lexer_error_t err = lexer_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_ERROR);

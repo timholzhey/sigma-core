@@ -70,9 +70,13 @@ typedef enum {
 #define TOKEN_FLAG_BEGIN_SCOPE	0x10
 #define TOKEN_FLAG_END_SCOPE	0x20
 
+#define TOKEN_PRECEDENCE_NONE	0xFF
+#define MAX_TOKEN_PRECEDENCE	2
+
 extern const char *token_str_repr_map[TOKEN_TYPE_COUNT];
-extern const uint32_t token_flags_map[TOKEN_TYPE_COUNT];
 extern const char *token_type_name_map[TOKEN_TYPE_COUNT];
+extern const uint32_t token_flags_map[TOKEN_TYPE_COUNT];
+extern const uint8_t token_precedence_map[TOKEN_TYPE_COUNT];
 
 struct ast_node_t {
 	struct ast_node_t *left;

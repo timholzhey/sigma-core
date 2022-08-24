@@ -102,11 +102,10 @@ static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len,
 	return STR_MATCH_FULL_MATCH;
 }
 
-retval_t lexer_lex(const char *input, token_t *tokens) {
+retval_t lexer_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens) {
 	m_lexer.error = LEXER_ERROR_OK;
 
 	int input_pos = 0;
-	int token_count = 0;
 	char buf[512];
 	int buf_pos = 0;
 	size_t input_len = strlen(input);
@@ -156,9 +155,14 @@ retval_t lexer_lex(const char *input, token_t *tokens) {
 
 		if (num_matches == 0 || input_pos == input_len - 1) {
 			if (latest_token.type != TOKEN_TYPE_UNKNOWN) {
+				if (*num_tokens > max_num_tokens) {
+					m_lexer.error = LEXER_ERROR_INSUFFICIENT_SPACE;
+					LEXER_FAIL_WITH_MSG("Insufficient space in output tokens");
+				}
+
 				// add token
-				memcpy(&tokens[token_count], &latest_token, sizeof(token_t));
-				token_count++;
+				memcpy(&tokens[*num_tokens], &latest_token, sizeof(token_t));
+				(*num_tokens)++;
 
 				// reset
 				buf_pos = 0;
@@ -181,13 +185,6 @@ retval_t lexer_lex(const char *input, token_t *tokens) {
 			}
 		}
 	}
-
-	// DEBUG
-	printf("Tokens: ");
-	for (int i = 0; i < token_count; i++) {
-		printf("[%s] ", token_type_name_map[tokens[i].type]);
-	}
-	printf("\n");
 
 	return RETVAL_OK;
 }

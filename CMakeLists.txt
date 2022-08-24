@@ -17,10 +17,11 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lexer
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/util
 )
 
-add_executable(sigma_core main.c inf/sigma.c inf/sigma.h lang/lexer/lexer.c lang/lexer/lexer.h lang/parser/parser.c lang/parser/parser.h lang/lang_def.h lang/lang_def.c)
+add_executable(sigma_core main.c inf/sigma.c inf/sigma.h lang/lexer/lexer.c lang/lexer/lexer.h lang/parser/parser.c lang/parser/parser.h lang/lang_def.h lang/lang_def.c lang/eval/evaluator.c lang/preprocess/preprocess.c lang/preprocess/preprocess.h)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)

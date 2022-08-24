@@ -9,11 +9,12 @@
 
 void lexer_set_var(char var);
 
-retval_t lexer_lex(const char *input, token_t *tokens);
+retval_t lexer_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens);
 
 typedef enum {
 	LEXER_ERROR_OK,
 	LEXER_ERROR_UNKNOWN_TOKEN,
+	LEXER_ERROR_INSUFFICIENT_SPACE,
 } lexer_error_t;
 
 lexer_error_t lexer_errno();

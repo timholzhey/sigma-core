@@ -7,4 +7,5 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lexer/lexer.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lang_def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser/parser.c
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess/preprocess.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_preprocessor.c)

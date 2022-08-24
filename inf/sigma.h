@@ -7,4 +7,8 @@
 
 const char *derive(const char *func, char var);
 
+typedef enum {
+	SIGMA_FUNCTION_DERIVE,
+} sigma_function_t;
+
 #endif //DERIVATIVE_CALCULATOR_MATHLANG_H

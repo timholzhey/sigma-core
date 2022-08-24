@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "parser.h"
 #include "logging.h"
 
@@ -22,7 +23,8 @@ static struct {
 }
 
 #define PARSER_HANDLE_MALLOC(expr) { \
-	if ((expr) == NULL) { \
+	if ((expr) == NULL) {               \
+        m_parser.error = PARSER_ERROR_MALLOC; \
     	PARSER_FAIL_WITH_MSG("Malloc returned NULL"); \
 	} \
 }
@@ -49,6 +51,7 @@ retval_t parser_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 	PARSER_HANDLE_MALLOC(current = calloc(1, sizeof(ast_node_t)));
 	ast_node_t *nesting_stack[MAX_NESTING_LEVEL];
 	uint32_t nesting_level = 0;
+	bool begin_scope_prefixed = false;
 
 	for (int token_pos = 0; token_pos < num_tokens; token_pos++) {
 		token_t token = tokens[token_pos];
@@ -67,6 +70,12 @@ retval_t parser_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 
 		// Case 2: Left child is unset
 		if (current->left == NULL) {
+			// Check begin scope was inferred by prefix
+			if (begin_scope_prefixed && token_flags_map[token.type] & TOKEN_FLAG_BEGIN_SCOPE) {
+				begin_scope_prefixed = false;
+				continue;
+			}
+
 			PARSER_HANDLE_MALLOC(current->left = calloc(1, sizeof(ast_node_t)));
 			memcpy(&current->left->token, &token, sizeof(token_t));
 
@@ -109,7 +118,21 @@ retval_t parser_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 				continue;
 			}
 
+			// Check end scope
+			if (token_flags_map[token.type] & TOKEN_FLAG_END_SCOPE) {
+				current = nesting_stack[--nesting_level];
+				continue;
+			}
+
 			memcpy(&current->right->token, &token, sizeof(token_t));
+
+			// Check prefix
+			if (token_flags_map[token.type] & TOKEN_FLAG_PREFIX) {
+				nesting_stack[nesting_level++] = current;
+				current = current->right;
+				begin_scope_prefixed = true;
+				continue;
+			}
 
 			continue;
 		}

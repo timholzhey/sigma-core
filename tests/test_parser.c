@@ -4,6 +4,7 @@
 
 #include "testlib.h"
 #include "parser.h"
+#include "lexer.h"
 
 TEST_DEF(test_parser, fail_tokens_null) {
 	retval_t ret = parser_parse(NULL, 10, NULL);
@@ -189,6 +190,40 @@ TEST_DEF(test_parser, simple_parentheses_2) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_parser, complex) {
+	const char *str = "x+1.5/sin(x)";
+	token_t tokens[1000];
+	lexer_set_var('x');
+	int num_tokens = 0;
+
+	token_type_t expect_token_types[] = {TOKEN_TYPE_VAR, TOKEN_TYPE_OPERATOR_ADD, TOKEN_TYPE_NUM,
+										 TOKEN_TYPE_OPERATOR_DIV, TOKEN_TYPE_FUNC_SIN, TOKEN_TYPE_PAREN_OPEN,
+										 TOKEN_TYPE_VAR, TOKEN_TYPE_PAREN_CLOSE};
+
+	retval_t lex_ret = lexer_lex(str, tokens, &num_tokens, 1000);
+	lexer_error_t lex_err = lexer_errno();
+
+	TEST_ASSERT_EQ(lex_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(lex_err, LEXER_ERROR_OK);
+
+	for (int i = 0; i < sizeof(expect_token_types) / sizeof(token_type_t); i++) {
+		TEST_ASSERT_EQ(tokens[i].type, expect_token_types[i]);
+	}
+
+	ast_node_t ast = {0};
+
+	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+	TEST_ASSERT_EQ(ast.token.type, TOKEN_TYPE_OPERATOR_DIV);
+	TEST_ASSERT_EQ(ast.left->token.type, TOKEN_TYPE_OPERATOR_ADD);
+	TEST_ASSERT_EQ(ast.right->token.type, TOKEN_TYPE_FUNC_SIN);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_RUNNER(test_parser) {
 	TEST_REG(test_parser, fail_tokens_null);
 	TEST_REG(test_parser, fail_no_tokens);
@@ -200,4 +235,5 @@ TEST_RUNNER(test_parser) {
 	TEST_REG(test_parser, simple_surround);
 	TEST_REG(test_parser, simple_parentheses);
 	TEST_REG(test_parser, simple_parentheses_2);
+	TEST_REG(test_parser, complex);
 }
