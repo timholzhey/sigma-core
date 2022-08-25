@@ -7,7 +7,7 @@
 
 #include "lang_def.h"
 
-retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *tokens_out, int *num_tokens_out, int max_num_tokens_out);
+retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_out, int *num_tokens_out, int max_num_tokens_out);
 
 typedef enum {
 	PREPROCESSOR_ERROR_OK,

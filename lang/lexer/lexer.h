@@ -9,7 +9,9 @@
 
 void lexer_set_var(char var);
 
-retval_t lexer_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens);
+char lexer_get_var();
+
+retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens);
 
 typedef enum {
 	LEXER_ERROR_OK,

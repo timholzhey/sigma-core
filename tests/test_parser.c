@@ -7,7 +7,7 @@
 #include "lexer.h"
 
 TEST_DEF(test_parser, fail_tokens_null) {
-	retval_t ret = parser_parse(NULL, 10, NULL);
+	retval_t ret = lang_parse(NULL, 10, NULL);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_ERROR);
@@ -19,7 +19,7 @@ TEST_DEF(test_parser, fail_tokens_null) {
 TEST_DEF(test_parser, fail_no_tokens) {
 	token_t tokens[] = {};
 
-	retval_t ret = parser_parse(tokens, 0, NULL);
+	retval_t ret = lang_parse(tokens, 0, NULL);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_ERROR);
@@ -37,7 +37,7 @@ TEST_DEF(test_parser, fail_unexpected_token) {
 	tokens[3].type = TOKEN_TYPE_NUM;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_ERROR);
@@ -54,7 +54,7 @@ TEST_DEF(test_parser, fail_surrounding_mismatch) {
 	tokens[2].type = TOKEN_TYPE_NUM;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_ERROR);
@@ -71,7 +71,7 @@ TEST_DEF(test_parser, simple_infix) {
 	tokens[2].type = TOKEN_TYPE_NUM;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -90,7 +90,7 @@ TEST_DEF(test_parser, simple_prefix) {
 	tokens[1].type = TOKEN_TYPE_VAR;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -108,7 +108,7 @@ TEST_DEF(test_parser, simple_postfix) {
 	tokens[1].type = TOKEN_TYPE_FUNC_FACT;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -127,7 +127,7 @@ TEST_DEF(test_parser, simple_surround) {
 	tokens[2].type = TOKEN_TYPE_FUNC_ABS;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -150,7 +150,7 @@ TEST_DEF(test_parser, simple_parentheses) {
 	tokens[6].type = TOKEN_TYPE_PAREN_CLOSE;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -176,7 +176,7 @@ TEST_DEF(test_parser, simple_parentheses_2) {
 	tokens[6].type = TOKEN_TYPE_NUM;
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);
@@ -200,7 +200,7 @@ TEST_DEF(test_parser, complex) {
 										 TOKEN_TYPE_OPERATOR_DIV, TOKEN_TYPE_FUNC_SIN, TOKEN_TYPE_PAREN_OPEN,
 										 TOKEN_TYPE_VAR, TOKEN_TYPE_PAREN_CLOSE};
 
-	retval_t lex_ret = lexer_lex(str, tokens, &num_tokens, 1000);
+	retval_t lex_ret = lang_lex(str, tokens, &num_tokens, 1000);
 	lexer_error_t lex_err = lexer_errno();
 
 	TEST_ASSERT_EQ(lex_ret, RETVAL_OK);
@@ -212,7 +212,7 @@ TEST_DEF(test_parser, complex) {
 
 	ast_node_t ast = {0};
 
-	retval_t ret = parser_parse(tokens, num_tokens, &ast);
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
 	parser_error_t err = parser_errno();
 
 	TEST_ASSERT_EQ(ret, RETVAL_OK);

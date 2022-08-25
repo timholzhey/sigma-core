@@ -8,6 +8,6 @@
 #include "lang_def.h"
 #include "sigma.h"
 
-retval_t evaluator_eval(ast_node_t *ast_in, ast_node_t *ast_out, sigma_function_t func);
+retval_t lang_eval(ast_node_t *ast_in, ast_node_t *ast_out, sigma_function_t func);
 
 #endif //SIGMA_CORE_EVALUATOR_H

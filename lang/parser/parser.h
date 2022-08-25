@@ -7,7 +7,7 @@
 
 #include "lang_def.h"
 
-retval_t parser_parse(token_t *tokens, int num_tokens, ast_node_t *ast);
+retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast);
 
 typedef enum {
 	PARSER_ERROR_OK,
