@@ -18,6 +18,10 @@ void lexer_set_var(char var) {
 	m_lexer.var = var;
 }
 
+char lexer_get_var() {
+	return m_lexer.var;
+}
+
 typedef enum {
 	STR_MATCH_NO_MATCH,
 	STR_MATCH_PARTIAL_MATCH,
@@ -102,7 +106,7 @@ static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len,
 	return STR_MATCH_FULL_MATCH;
 }
 
-retval_t lexer_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens) {
+retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_num_tokens) {
 	m_lexer.error = LEXER_ERROR_OK;
 
 	int input_pos = 0;

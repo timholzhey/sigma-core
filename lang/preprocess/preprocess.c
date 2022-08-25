@@ -17,7 +17,7 @@ static preprocessor_error_t error;
 	return RETVAL_ERROR; \
 }
 
-retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *tokens_out, int *num_tokens_out, int max_num_tokens_out) {
+retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_out, int *num_tokens_out, int max_num_tokens_out) {
 	error = PREPROCESSOR_ERROR_OK;
 
 	if (num_tokens_in > max_num_tokens_out) {
@@ -38,6 +38,10 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 		}
 		if (begin_scope && (tokens_out[i].type == TOKEN_TYPE_OPERATOR_ADD || tokens_out[i].type == TOKEN_TYPE_OPERATOR_SUB)) {
 			// Insert zero before leading operator
+			if (*num_tokens_out + 1 > max_num_tokens_out) {
+				error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
+				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
+			}
 			int k = 0;
 			for (int j = 0; j < *num_tokens_out; j++, k++) {
 				if (j == i) {
@@ -49,10 +53,6 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 				tokens_temp[k] = tokens_out[j];
 			}
 			*num_tokens_out = k;
-			if (*num_tokens_out > max_num_tokens_out) {
-				error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
-				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
-			}
 			i++;
 
 			// Copy back from temp
@@ -64,10 +64,12 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 	// Truncate consecutive negative signs
 	uint8_t consec_neg_count = 0;
 	for (int i = 0; i < *num_tokens_out; i++) {
+		// Accumulate negative signs
 		if (tokens_out[i].type == TOKEN_TYPE_OPERATOR_SUB) {
 			consec_neg_count++;
 			continue;
 		}
+		// Truncate
 		if (consec_neg_count > 1) {
 			if (consec_neg_count % 2 == 0) {
 				tokens_out[i - consec_neg_count].type = TOKEN_TYPE_OPERATOR_ADD;
@@ -81,6 +83,28 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 			i -= consec_neg_count - 1;
 		}
 		consec_neg_count = 0;
+	}
+
+	// Insert implicit multiplication operator
+	for (int i = 1; i < *num_tokens_out; i++) {
+		// Find matching pair
+		if (token_flags_map[tokens_out[i].type] & TOKEN_FLAG_IMPL_MULT_BEFORE &&
+			token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_IMPL_MULT_AFTER) {
+			if (*num_tokens_out + 1 > max_num_tokens_out) {
+				error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
+				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
+			}
+
+			for (int j = *num_tokens_out - 1; j > i; j--) {
+				tokens_out[j + 1] = tokens_out[j];
+			}
+
+			// Insert mult operator
+			tokens_out[i].type = TOKEN_TYPE_OPERATOR_MUL;
+
+			(*num_tokens_out)++;
+			i++;
+		}
 	}
 
 	// Insert parenthesis based on operator precedence
@@ -105,7 +129,16 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 					}
 				}
 
+				// Check if wrapping is necessary
+				if (left_bound == 0 && right_bound == *num_tokens_out - 1) {
+					continue;
+				}
+
 				// Insert parenthesis before left bound and after right bound into temp
+				if (*num_tokens_out + 2 > max_num_tokens_out) {
+					error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
+					PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
+				}
 				int k = 0;
 				for (int j = 0; j < *num_tokens_out; j++, k++) {
 					if (j == left_bound) {
@@ -117,10 +150,6 @@ retval_t preprocessor_process(token_t *tokens_in, int num_tokens_in, token_t *to
 					}
 				}
 				*num_tokens_out = k;
-				if (*num_tokens_out > max_num_tokens_out) {
-					error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
-					PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
-				}
 				i += 2;
 
 				// Copy back from temp
