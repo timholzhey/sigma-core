@@ -158,7 +158,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 		}
 
 		if (num_matches == 0 || input_pos == input_len - 1) {
-			if (latest_token.type != TOKEN_TYPE_UNKNOWN) {
+			if (latest_token.type != TOKEN_TYPE_NONE) {
 				if (*num_tokens > max_num_tokens) {
 					m_lexer.error = LEXER_ERROR_INSUFFICIENT_SPACE;
 					LEXER_FAIL_WITH_MSG("Insufficient space in output tokens");
@@ -170,7 +170,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 
 				// reset
 				buf_pos = 0;
-				latest_token.type = TOKEN_TYPE_UNKNOWN;
+				latest_token.type = TOKEN_TYPE_NONE;
 				latest_token.value_type = TOKEN_VALUE_TYPE_NONE;
 				best_match = STR_MATCH_NO_MATCH;
 

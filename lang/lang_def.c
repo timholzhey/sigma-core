@@ -5,7 +5,8 @@
 #include "lang_def.h"
 
 const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
-		[TOKEN_TYPE_UNKNOWN] = "",
+		[TOKEN_TYPE_NONE] = "",
+		[TOKEN_TYPE_ANY] = "",
 		[TOKEN_TYPE_OPERATOR_ADD] = "+",
 		[TOKEN_TYPE_OPERATOR_SUB] = "-",
 		[TOKEN_TYPE_OPERATOR_MUL] = "*",
@@ -33,7 +34,8 @@ const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
 };
 
 const char *token_type_name_map[TOKEN_TYPE_COUNT] = {
-		[TOKEN_TYPE_UNKNOWN] = "UNKNOWN",
+		[TOKEN_TYPE_NONE] = "UNKNOWN",
+		[TOKEN_TYPE_ANY] = "ANY",
 		[TOKEN_TYPE_OPERATOR_ADD] = "OP_ADD",
 		[TOKEN_TYPE_OPERATOR_SUB] = "OP_SUB",
 		[TOKEN_TYPE_OPERATOR_MUL] = "OP_MUL",
@@ -61,7 +63,8 @@ const char *token_type_name_map[TOKEN_TYPE_COUNT] = {
 };
 
 const uint32_t token_flags_map[TOKEN_TYPE_COUNT] = {
-		[TOKEN_TYPE_UNKNOWN] = TOKEN_FLAG_NONE,
+		[TOKEN_TYPE_NONE] = TOKEN_FLAG_NONE,
+		[TOKEN_TYPE_ANY] = TOKEN_FLAG_NONE,
 		[TOKEN_TYPE_OPERATOR_ADD] = TOKEN_FLAG_INFIX,
 		[TOKEN_TYPE_OPERATOR_SUB] = TOKEN_FLAG_INFIX,
 		[TOKEN_TYPE_OPERATOR_MUL] = TOKEN_FLAG_INFIX,
@@ -89,7 +92,8 @@ const uint32_t token_flags_map[TOKEN_TYPE_COUNT] = {
 };
 
 const uint8_t token_precedence_map[TOKEN_TYPE_COUNT] = {
-		[TOKEN_TYPE_UNKNOWN] = TOKEN_PRECEDENCE_NONE,
+		[TOKEN_TYPE_NONE] = TOKEN_PRECEDENCE_NONE,
+		[TOKEN_TYPE_ANY] = TOKEN_PRECEDENCE_NONE,
 		[TOKEN_TYPE_OPERATOR_ADD] = 2,
 		[TOKEN_TYPE_OPERATOR_SUB] = 2,
 		[TOKEN_TYPE_OPERATOR_MUL] = 1,

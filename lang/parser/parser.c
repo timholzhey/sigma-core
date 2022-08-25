@@ -57,7 +57,7 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 		token_t token = tokens[token_pos];
 
 		// Case 1: Current token is unset
-		if (current->token.type == TOKEN_TYPE_UNKNOWN) {
+		if (current->token.type == TOKEN_TYPE_NONE) {
 			// Check begin scope
 			if (token_flags_map[token.type] & TOKEN_FLAG_BEGIN_SCOPE) {
 				nesting_stack[nesting_level++] = current;
