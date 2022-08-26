@@ -6,10 +6,11 @@
 #include "pattern_compile.h"
 #include "logging.h"
 #include <stdbool.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 // MUL,(NUM),MUL,-,-,(NUM),(ANY) > MUL,[MUL,$1,$2],$3
 retval_t pattern_compile_rule(const char *rule, size_t rule_len, pattern_t *pattern) {
+	memset(pattern, 0, sizeof(pattern_t));
 	char tok_buf[16];
 	int tok_buf_pos = 0;
 	bool do_capture = false;
@@ -21,21 +22,8 @@ retval_t pattern_compile_rule(const char *rule, size_t rule_len, pattern_t *patt
 	int replacement_node_pos = 0;
 	int capture_index = 0;
 	token_type_t *store_type;
-	memset(pattern, 0, sizeof(pattern_t));
 
 	for (int i = 0; i < rule_len; i++) {
-		if (rule[i] == ' ' || rule[i] == '\t') {
-			tok_buf_pos = 0;
-			continue;
-		}
-
-		if (rule[i] == '>') {
-			pattern_nodes = pattern->replace;
-			pattern_node_pos = &pattern->num_replace_nodes;
-			tok_buf_pos = 0;
-			continue;
-		}
-
 		if (rule[i] == '(' && !do_capture && !do_eval) {
 			do_capture = true;
 			tok_buf_pos = 0;
@@ -99,7 +87,7 @@ retval_t pattern_compile_rule(const char *rule, size_t rule_len, pattern_t *patt
 			continue;
 		}
 
-		if ((rule[i] == ',' || (rule[i] == ')' && do_capture)) && tok_buf_pos > 0) {
+		if ((rule[i] == ',' || rule[i] == ' ' || rule[i] == '>' || (rule[i] == ')' && do_capture)) && tok_buf_pos > 0) {
 			pattern_nodes[*pattern_node_pos].type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 			if (memcmp(tok_buf, "MUL", tok_buf_pos) == 0) {
 				*store_type = TOKEN_TYPE_OPERATOR_MUL;
@@ -127,6 +115,18 @@ retval_t pattern_compile_rule(const char *rule, size_t rule_len, pattern_t *patt
 				continue;
 			}
 			(*pattern_node_pos)++;
+			continue;
+		}
+
+		if (rule[i] == ' ' || rule[i] == '\t') {
+			tok_buf_pos = 0;
+			continue;
+		}
+
+		if (rule[i] == '>') {
+			pattern_nodes = pattern->replace;
+			pattern_node_pos = &pattern->num_replace_nodes;
+			tok_buf_pos = 0;
 			continue;
 		}
 

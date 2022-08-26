@@ -9,7 +9,9 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser/parser.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess/preprocess.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/stringify/stringify.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/pattern_compile.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/compile/pattern_compile.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/match/pattern_match.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/replace/pattern_replace.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_preprocessor.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_stringify.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_pattern.c

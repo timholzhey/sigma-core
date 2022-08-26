@@ -6,6 +6,7 @@
 #define SIGMA_CORE_PATTERN_COMPILE_H
 
 #include "lang_def.h"
+#include <stddef.h>
 
 typedef enum {
 	PATTERN_NODE_TYPE_MATCH_TOKEN,

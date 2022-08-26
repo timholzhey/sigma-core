@@ -20,10 +20,13 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/stringify
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/compile
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/match
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/replace
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/util
 )
 
-add_executable(sigma_core main.c inf/sigma.c inf/sigma.h lang/lexer/lexer.c lang/lexer/lexer.h lang/parser/parser.c lang/parser/parser.h lang/lang_def.h lang/lang_def.c lang/eval/evaluator.c lang/preprocess/preprocess.c lang/preprocess/preprocess.h func/deriv/impl/func_derive.c func/deriv/impl/func_derive.h lang/stringify/stringify.c lang/stringify/stringify.h lang/pattern/pattern_compile.c lang/pattern/pattern_compile.h)
+add_executable(sigma_core main.c inf/sigma.c inf/sigma.h lang/lexer/lexer.c lang/lexer/lexer.h lang/parser/parser.c lang/parser/parser.h lang/lang_def.h lang/lang_def.c lang/eval/evaluator.c lang/preprocess/preprocess.c lang/preprocess/preprocess.h func/deriv/impl/func_derive.c func/deriv/impl/func_derive.h lang/stringify/stringify.c lang/stringify/stringify.h lang/pattern/compile/pattern_compile.c lang/pattern/compile/pattern_compile.h lang/pattern/match/pattern_match.c lang/pattern/match/pattern_match.h lang/pattern/replace/pattern_replace.c lang/pattern/replace/pattern_replace.h)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)
