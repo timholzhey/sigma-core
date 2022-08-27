@@ -75,7 +75,7 @@ retval_t lang_stringify(ast_node_t *ast, char **string, int *str_len) {
 	static int max_str_len = 100;
 	*string = malloc(max_str_len);
 	if (*string == NULL) {
-		STRINGIFIER_FAIL_WITH_MSG("Malloc returned null");
+		STRINGIFIER_FAIL_WITH_MSG("Could not allocate memory for string");
 	}
 
 	*str_len = stringify_node(ast, *string, max_str_len);

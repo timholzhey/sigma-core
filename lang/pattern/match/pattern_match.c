@@ -6,7 +6,10 @@
 #include "logging.h"
 
 static bool pattern_match_node(ast_node_t *ast, pattern_node_t *pattern_node, int node_idx, int num_nodes) {
-	if (ast == NULL && pattern_node[node_idx].token_type != TOKEN_TYPE_NONE) {
+	if (ast == NULL) {
+		if (pattern_node[node_idx].token_type == TOKEN_TYPE_NONE) {
+			return true;
+		}
 		return false;
 	}
 	if (num_nodes > node_idx && ast->token.type != pattern_node[node_idx].token_type && pattern_node[node_idx].token_type != TOKEN_TYPE_ANY) {
@@ -21,6 +24,12 @@ static bool pattern_match_node(ast_node_t *ast, pattern_node_t *pattern_node, in
 	return true;
 }
 
-bool pattern_match(ast_node_t *ast, pattern_t *pattern) {
-	return pattern_match_node(ast, pattern->match, 0, pattern->num_match_nodes);
+retval_t pattern_match(ast_node_t *ast, pattern_t *pattern, bool *is_match) {
+	if (ast == NULL || pattern == NULL) {
+		log_error("Invalid arguments");
+		return RETVAL_ERROR;
+	}
+
+	*is_match = pattern_match_node(ast, pattern->match, 0, pattern->num_match_nodes);
+	return RETVAL_OK;
 }

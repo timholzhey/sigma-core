@@ -6,9 +6,9 @@
 #define SIGMA_CORE_PATTERN_MATCH_H
 
 #include "lang_def.h"
-#include "pattern/compile/pattern_compile.h"
+#include "pattern.h"
 #include <stdbool.h>
 
-bool pattern_match(ast_node_t *ast, pattern_t *pattern);
+retval_t pattern_match(ast_node_t *ast, pattern_t *pattern, bool *is_match);
 
 #endif //SIGMA_CORE_PATTERN_MATCH_H

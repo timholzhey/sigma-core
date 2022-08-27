@@ -41,7 +41,7 @@ typedef enum {
 } token_type_t;
 
 typedef struct {
-	float number;
+	double number;
 	char identifier[TOKEN_MAX_STR_IDENT_LENGTH];
 } token_value_t;
 

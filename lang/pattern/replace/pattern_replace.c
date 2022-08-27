@@ -3,36 +3,99 @@
 //
 
 #include "pattern_replace.h"
+#include "pattern_capture.h"
 #include "logging.h"
+#include <stdlib.h>
+#include <string.h>
 
-static retval_t pattern_replace_node(ast_node_t *ast, pattern_node_t *pattern_nodes, int node_idx, int num_nodes) {
+static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx, int num_nodes,
+									 ast_node_t **capture_nodes, int num_capture_groups, ast_node_t *ast) {
 	if (ast == NULL) {
+		log_error("AST is NULL");
 		return RETVAL_ERROR;
 	}
 
+	pattern_node_t *node = &pattern_nodes[node_idx];
 	switch (pattern_nodes[node_idx].type) {
-		case PATTERN_NODE_TYPE_REPLACE_TOKEN:
+		case PATTERN_NODE_TYPE_MATCH_TOKEN:
 			ast->token.type = pattern_nodes[node_idx].token_type;
 			break;
 
+		case PATTERN_NODE_TYPE_REPLACE_TOKEN: {
+			int capture_idx = pattern_nodes[node_idx].capture_idx;
+			if (capture_idx < 0 || capture_idx >= num_capture_groups) {
+				log_error("Invalid capture group replacement index");
+				return RETVAL_ERROR;
+			}
+
+			memcpy(ast, capture_nodes[capture_idx], sizeof(ast_node_t));
+		}
+		break;
+
 		case PATTERN_NODE_TYPE_REPLACE_EVAL_TOKEN:
-			pattern_eval_node(ast, pattern_nodes[node_idx].capture_replacement, pattern_nodes[node_idx].num_capture_replacements);
+			if (pattern_nodes[node_idx].num_replacement_nodes == 0) {
+				log_error("Cannot replace with no nodes provided");
+				return RETVAL_ERROR;
+			}
+			if (pattern_replace_node(pattern_nodes[node_idx].replacement, 0,
+									 pattern_nodes[node_idx].num_replacement_nodes, capture_nodes, num_capture_groups,
+									 ast) != RETVAL_OK) {
+				log_error("Failed to build replacement node");
+				return RETVAL_ERROR;
+			}
 			break;
 
 		default:
-			log_error("Unknown pattern node type %u", pattern_nodes[node_idx].type);
+			log_error("Unhandled pattern node type %u", pattern_nodes[node_idx].type);
 			return RETVAL_ERROR;
+	}
+
+	if (num_nodes > 2 * node_idx + 1) {
+		ast->left = malloc(sizeof(ast_node_t));
+		if (ast->left == NULL) {
+			log_error("Could not allocate memory for AST node");
+			return RETVAL_ERROR;
+		}
+		if (pattern_replace_node(pattern_nodes, 2 * node_idx + 1, num_nodes, capture_nodes, num_capture_groups,
+								 ast->left) != RETVAL_OK) {
+			return RETVAL_ERROR;
+		}
+	}
+
+	if (num_nodes > 2 * node_idx + 2) {
+		ast->right = malloc(sizeof(ast_node_t));
+		if (ast->right == NULL) {
+			log_error("Could not allocate memory for AST node");
+			return RETVAL_ERROR;
+		}
+		if (pattern_replace_node(pattern_nodes, 2 * node_idx + 2, num_nodes, capture_nodes, num_capture_groups,
+								 ast->right) != RETVAL_OK) {
+			return RETVAL_ERROR;
+		}
 	}
 
 	return RETVAL_OK;
 }
 
-void pattern_get_capture_groups(ast_node_t *ast, pattern_node_t *pattern_nodes) {
+retval_t pattern_replace(ast_node_t *ast_in, pattern_t *pattern, ast_node_t *ast_out) {
+	if (ast_in == NULL || pattern == NULL || ast_out == NULL) {
+		log_error("Invalid arguments");
+		return RETVAL_ERROR;
+	}
 
-}
+	ast_node_t *capture_groups[10];
+	int num_capture_groups = 0;
 
-retval_t pattern_replace(ast_node_t *ast, pattern_t *pattern) {
-	ast_node_t capture_groups[10];
-	pattern_get_capture_groups(ast, pattern->match, capture_groups);
-	return pattern_replace_node(ast, pattern->replace, 0, pattern->num_replace_nodes);
+	if (pattern_capture(ast_in, pattern, capture_groups, &num_capture_groups) != RETVAL_OK) {
+		log_error("Failed to build capture groups");
+		return RETVAL_ERROR;
+	}
+
+	if (pattern_replace_node(pattern->replace, 0, pattern->num_replace_nodes, capture_groups, num_capture_groups,
+							 ast_out) != RETVAL_OK) {
+		log_error("Failed to build replacement AST");
+		return RETVAL_ERROR;
+	}
+
+	return RETVAL_OK;
 }

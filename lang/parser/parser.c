@@ -25,7 +25,7 @@ static struct {
 #define PARSER_HANDLE_MALLOC(expr) { \
 	if ((expr) == NULL) {               \
         m_parser.error = PARSER_ERROR_MALLOC; \
-    	PARSER_FAIL_WITH_MSG("Malloc returned NULL"); \
+    	PARSER_FAIL_WITH_MSG("Could not allocate memory"); \
 	} \
 }
 

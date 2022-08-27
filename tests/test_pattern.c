@@ -4,17 +4,19 @@
 
 #include "testlib.h"
 #include "lang_def.h"
-#include "pattern/compile/pattern_compile.h"
+#include "pattern_compile.h"
 #include "parser.h"
-#include "pattern/match/pattern_match.h"
-#include "pattern/replace/pattern_replace.h"
+#include "pattern_match.h"
+#include "pattern_replace.h"
 #include <string.h>
+#include <pattern_capture.h>
+#include <pattern_generate.h>
 
 TEST_DEF(test_pattern, compile_simple) {
 	const char *rule = "MUL,(NUM),MUL,-,-,(NUM),(ANY) > MUL,[MUL,$1,$2],$3";
 	pattern_t pattern;
 
-	retval_t ret = pattern_compile_rule(rule, strlen(rule), &pattern);
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
 
 	pattern_t expect_pattern;
 	expect_pattern.num_match_nodes = 7;
@@ -44,9 +46,16 @@ TEST_DEF(test_pattern, compile_simple) {
 		TEST_ASSERT_EQ(expect_pattern.replace[i].token_type, pattern.replace[i].token_type);
 	}
 
-	TEST_ASSERT_TRUE(pattern.replace[0].capture_replacement == NULL);
-	TEST_ASSERT_TRUE(pattern.replace[1].capture_replacement != NULL);
-	TEST_ASSERT_TRUE(pattern.replace[2].capture_replacement == NULL);
+	TEST_ASSERT_TRUE(pattern.replace[0].replacement == NULL);
+	TEST_ASSERT_TRUE(pattern.replace[1].replacement != NULL);
+	TEST_ASSERT_EQ(pattern.replace[1].num_replacement_nodes, 3);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[0].token_type, TOKEN_TYPE_OPERATOR_MUL);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[0].type, PATTERN_NODE_TYPE_MATCH_TOKEN);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[1].type, PATTERN_NODE_TYPE_REPLACE_TOKEN);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[1].capture_idx, 0);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[2].type, PATTERN_NODE_TYPE_REPLACE_TOKEN);
+	TEST_ASSERT_EQ(pattern.replace[1].replacement[2].capture_idx, 1);
+	TEST_ASSERT_TRUE(pattern.replace[2].replacement == NULL);
 
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
@@ -55,7 +64,7 @@ TEST_DEF(test_pattern, match_simple) {
 	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
 	pattern_t pattern;
 
-	retval_t ret = pattern_compile_rule(rule, strlen(rule), &pattern);
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
 
 	pattern_t expect_pattern;
 	expect_pattern.num_match_nodes = 7;
@@ -82,9 +91,66 @@ TEST_DEF(test_pattern, match_simple) {
 	TEST_ASSERT_EQ(parse_ret, RETVAL_OK);
 	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
 
-	bool match = pattern_match(&ast, &pattern);
+	bool match = false;
+	retval_t match_ret = pattern_match(&ast, &pattern, &match);
 
+	TEST_ASSERT_EQ(match_ret, RETVAL_OK);
 	TEST_ASSERT_EQ(match, true);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_pattern, capture_simple) {
+	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 7;
+	expect_pattern.num_replace_nodes = 3;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	int num_tokens = 5;
+	token_t tokens[num_tokens];
+	tokens[0].type = TOKEN_TYPE_NUM;
+	tokens[0].value.number = 2;
+	tokens[1].type = TOKEN_TYPE_OPERATOR_MUL;
+	tokens[2].type = TOKEN_TYPE_NUM;
+	tokens[2].value.number = 3;
+	tokens[3].type = TOKEN_TYPE_OPERATOR_MUL;
+	tokens[4].type = TOKEN_TYPE_VAR;
+	ast_node_t ast = {0};
+
+	retval_t parse_ret = lang_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(parse_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+
+	bool match = false;
+	retval_t match_ret = pattern_match(&ast, &pattern, &match);
+
+	TEST_ASSERT_EQ(match_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(match, true);
+
+	ast_node_t *capture_nodes[10] = {0};
+	int num_capture_nodes = 0;
+	retval_t capture_ret = pattern_capture(&ast, &pattern, capture_nodes, &num_capture_nodes);
+
+	TEST_ASSERT_EQ(capture_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(num_capture_nodes, 3);
+	TEST_ASSERT_NOT_NULL(capture_nodes[0]);
+	TEST_ASSERT_NOT_NULL(capture_nodes[1]);
+	TEST_ASSERT_NOT_NULL(capture_nodes[2]);
+	TEST_ASSERT_EQ(capture_nodes[0]->token.type, TOKEN_TYPE_VAR);
+	TEST_ASSERT_EQ(capture_nodes[1]->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ_DOUBLE(capture_nodes[1]->token.value.number, 2.0f);
+	TEST_ASSERT_EQ(capture_nodes[2]->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ_DOUBLE(capture_nodes[2]->token.value.number, 3.0f);
 
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
@@ -93,7 +159,7 @@ TEST_DEF(test_pattern, replace_simple) {
 	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
 	pattern_t pattern;
 
-	retval_t ret = pattern_compile_rule(rule, strlen(rule), &pattern);
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
 
 	pattern_t expect_pattern;
 	expect_pattern.num_match_nodes = 7;
@@ -120,11 +186,97 @@ TEST_DEF(test_pattern, replace_simple) {
 	TEST_ASSERT_EQ(parse_ret, RETVAL_OK);
 	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
 
-	bool match = pattern_match(&ast, &pattern);
+	bool match = false;
+	retval_t match_ret = pattern_match(&ast, &pattern, &match);
 
+	TEST_ASSERT_EQ(match_ret, RETVAL_OK);
 	TEST_ASSERT_EQ(match, true);
 
-	retval_t replace_ret = pattern_replace(&ast, &pattern);
+	ast_node_t ast_out;
+	retval_t replace_ret = pattern_replace(&ast, &pattern, &ast_out);
+
+	TEST_ASSERT_EQ(replace_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(ast_out.token.type, TOKEN_TYPE_OPERATOR_MUL);
+	TEST_ASSERT_NOT_NULL(ast_out.left);
+	TEST_ASSERT_EQ(ast_out.left->token.type, TOKEN_TYPE_OPERATOR_MUL);
+	TEST_ASSERT_NOT_NULL(ast_out.left->left);
+	TEST_ASSERT_EQ(ast_out.left->left->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ_DOUBLE(ast_out.left->left->token.value.number, 2.0f);
+	TEST_ASSERT_NOT_NULL(ast_out.left->right);
+	TEST_ASSERT_EQ(ast_out.left->right->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ_DOUBLE(ast_out.left->right->token.value.number, 3.0f);
+	TEST_ASSERT_NOT_NULL(ast_out.right);
+	TEST_ASSERT_EQ(ast_out.right->token.type, TOKEN_TYPE_VAR);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_pattern, apply_simple) {
+	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 7;
+	expect_pattern.num_replace_nodes = 3;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	int num_tokens = 5;
+	token_t tokens[num_tokens];
+	tokens[0].type = TOKEN_TYPE_NUM;
+	tokens[0].value.number = 2;
+	tokens[1].type = TOKEN_TYPE_OPERATOR_MUL;
+	tokens[2].type = TOKEN_TYPE_NUM;
+	tokens[2].value.number = 3;
+	tokens[3].type = TOKEN_TYPE_OPERATOR_MUL;
+	tokens[4].type = TOKEN_TYPE_VAR;
+	ast_node_t ast = {0};
+
+	retval_t parse_ret = lang_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(parse_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+
+	retval_t apply_ret = pattern_apply(&ast, &pattern);
+
+	TEST_ASSERT_EQ(apply_ret, RETVAL_OK);
+
+	TEST_ASSERT_EQ(ast.token.type, TOKEN_TYPE_OPERATOR_MUL);
+	TEST_ASSERT_NOT_NULL(ast.left);
+	TEST_ASSERT_EQ(ast.left->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ_DOUBLE(ast.left->token.value.number, 6.0f);
+	TEST_ASSERT_NOT_NULL(ast.right);
+	TEST_ASSERT_EQ(ast.right->token.type, TOKEN_TYPE_VAR);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_pattern, generate_simple) {
+	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 7;
+	expect_pattern.num_replace_nodes = 3;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	const int max_num_patterns = 100;
+	pattern_t patterns[100];
+	int num_patterns = 0;
+	retval_t generate_ret = pattern_generate(&pattern, patterns, &num_patterns, max_num_patterns);
+
+	TEST_ASSERT_EQ(generate_ret, RETVAL_OK);
+	TEST_ASSERT_EQ(num_patterns, 2);
 
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
@@ -132,5 +284,8 @@ TEST_DEF(test_pattern, replace_simple) {
 TEST_RUNNER(test_pattern) {
 	TEST_REG(test_pattern, compile_simple);
 	TEST_REG(test_pattern, match_simple);
+	TEST_REG(test_pattern, capture_simple);
 	TEST_REG(test_pattern, replace_simple);
+	TEST_REG(test_pattern, apply_simple);
+	TEST_REG(test_pattern, generate_simple);
 }
