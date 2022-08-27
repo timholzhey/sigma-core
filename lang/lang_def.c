@@ -34,7 +34,7 @@ const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
 };
 
 const char *token_type_name_map[TOKEN_TYPE_COUNT] = {
-		[TOKEN_TYPE_NONE] = "UNKNOWN",
+		[TOKEN_TYPE_NONE] = "-",
 		[TOKEN_TYPE_ANY] = "ANY",
 		[TOKEN_TYPE_OPERATOR_ADD] = "OP_ADD",
 		[TOKEN_TYPE_OPERATOR_SUB] = "OP_SUB",

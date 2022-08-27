@@ -2,6 +2,8 @@
 // Created by Tim Holzhey on 16.08.22.
 //
 
+#include <stdbool.h>
+#include "func_derive.h"
 #include "sigma.h"
 #include "lang_def.h"
 #include "lexer.h"
@@ -9,16 +11,38 @@
 #include "logging.h"
 #include "preprocess.h"
 #include "evaluator.h"
-#include "stringify/stringify.h"
+#include "stringify.h"
+#include "func_const.h"
 
 #define MAX_NUM_TOKENS 1000
+
+static bool module_initialized = false;
+
+void sigma_init() {
+	if (module_initialized) {
+		return;
+	}
+	func_derive_init();
+	func_const_init();
+	module_initialized = true;
+}
 
 const char *retval_string[RETVAL_COUNT] = {
 		[RETVAL_OK] = "OK",
 		[RETVAL_ERROR] = "Error",
 };
 
-static const char *sigma_function(const char *func_str, char var, sigma_function_t sigma_func) {
+const char *sigma_function(const char *func_str, char var, sigma_function_t sigma_func) {
+	if (!module_initialized) {
+		log_error("Sigma: Module is not initialized");
+		return "ERR";
+	}
+
+	if (sigma_func >= SIGMA_FUNCTION_COUNT) {
+		log_error("Unknown sigma function %u", sigma_func);
+		return "ERR";
+	}
+
 	token_t tokens[MAX_NUM_TOKENS];
 	int num_tokens = 0;
 

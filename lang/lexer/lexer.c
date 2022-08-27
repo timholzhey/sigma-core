@@ -150,7 +150,8 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 			num_matches++;
 		}
 		if (match > best_match) {
-			float num = strtof(buf, NULL);
+			buf[buf_pos] = '\0';
+			double num = strtod(buf, NULL);
 			num_matches++;
 			latest_token.type = TOKEN_TYPE_NUM;
 			latest_token.value_type = TOKEN_VALUE_TYPE_NUMBER;

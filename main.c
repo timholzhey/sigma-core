@@ -4,6 +4,8 @@
 #include "sigma.h"
 
 int main() {
+	sigma_init();
+
 	const char *func = "x+1.5/sin(x)";
 	printf("f(x) =  %s\n", func);
 

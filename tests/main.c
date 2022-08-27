@@ -9,6 +9,7 @@ TEST_GROUP_REG(test_parser);
 TEST_GROUP_REG(test_preprocessor);
 TEST_GROUP_REG(test_stringify);
 TEST_GROUP_REG(test_pattern);
+TEST_GROUP_REG(test_func_const);
 
 int main() {
 	TEST_GROUP_RUN(test_lexer);
@@ -16,4 +17,5 @@ int main() {
 	TEST_GROUP_RUN(test_preprocessor);
 	TEST_GROUP_RUN(test_stringify);
 	TEST_GROUP_RUN(test_pattern);
+	TEST_GROUP_RUN(test_func_const);
 }

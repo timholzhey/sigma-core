@@ -7,6 +7,8 @@
 
 #include "lang_def.h"
 
+void func_derive_init();
+
 retval_t func_derive(ast_node_t *ast_in, ast_node_t *ast_out);
 
 #endif //SIGMA_CORE_FUNC_DERIVE_H
