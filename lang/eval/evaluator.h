@@ -7,6 +7,7 @@
 
 #include "lang_def.h"
 #include "sigma.h"
+#include "pattern.h"
 
 retval_t lang_eval(ast_node_t *ast_in, ast_node_t *ast_out, sigma_function_t func);
 

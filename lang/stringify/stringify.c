@@ -38,8 +38,8 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 			break;
 
 		case TOKEN_TYPE_OPERATOR_MUL:
-			if (!(ast->left && token_flags_map[ast->left->token.type] & TOKEN_FLAG_IMPL_MULT_AFTER &&
-				ast->right && token_flags_map[ast->right->token.type] & TOKEN_FLAG_IMPL_MULT_BEFORE)) {
+			if (!(ast->left && token_flags_map[ast->left->token.type] & TOKEN_FLAG_IMPL_MUL_AFTER &&
+				  ast->right && token_flags_map[ast->right->token.type] & TOKEN_FLAG_IMPL_MUL_BEFORE)) {
 				chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
 			}
 			break;
@@ -73,7 +73,7 @@ retval_t lang_stringify(ast_node_t *ast, char **string, int *str_len) {
 	}
 
 	static int max_str_len = 100;
-	*string = malloc(max_str_len);
+	*string = calloc(1, max_str_len);
 	if (*string == NULL) {
 		STRINGIFIER_FAIL_WITH_MSG("Could not allocate memory for string");
 	}

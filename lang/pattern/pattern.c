@@ -29,6 +29,8 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern) {
 		return RETVAL_OK;
 	}
 
+	log_debug("Transform %s", pattern->name);
+
 	ast_node_t ast_out;
 	if (pattern_replace(ast, pattern, &ast_out) != RETVAL_OK) {
 		log_error("Pattern replacing failed")
@@ -55,7 +57,7 @@ retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registr
 	return RETVAL_OK;
 }
 
-retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *rule) {
+retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule) {
 	if (registry->num_patterns + 1 > MAX_NUM_PATTERNS_REGISTRY) {
 		log_error("Cannot add pattern to registry: Maximum patterns in registry exceeded!");
 		return RETVAL_ERROR;
@@ -73,6 +75,7 @@ retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *rul
 		return RETVAL_ERROR;
 	}
 
+	registry->patterns[registry->num_patterns].name = name;
 	registry->num_patterns++;
 
 	memcpy(&registry->patterns[registry->num_patterns], patterns, num_patterns * sizeof(pattern_t));

@@ -60,6 +60,124 @@ TEST_DEF(test_pattern, compile_simple) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_pattern, compile_match_number) {
+	const char *rule = "POW,(ANY),(NUM=1) > $1";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 3;
+	expect_pattern.num_replace_nodes = 1;
+
+	expect_pattern.match[0].token_type = TOKEN_TYPE_OPERATOR_POW;
+	expect_pattern.match[1].token_type = TOKEN_TYPE_ANY;
+	expect_pattern.match[2].token_type = TOKEN_TYPE_NUM;
+
+	expect_pattern.replace[0].token_type = TOKEN_TYPE_NONE;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	for (int i = 0; i < expect_pattern.num_match_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.match[i].token_type, pattern.match[i].token_type);
+	}
+
+	for (int i = 0; i < expect_pattern.num_replace_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.replace[i].token_type, pattern.replace[i].token_type);
+	}
+
+	TEST_ASSERT_EQ(pattern.match[2].capture_idx, 1);
+	TEST_ASSERT_EQ(pattern.match[2].type, PATTERN_NODE_TYPE_CAPTURE_TOKEN);
+	TEST_ASSERT_EQ(pattern.match[2].has_number, 1);
+	TEST_ASSERT_EQ_DOUBLE(pattern.match[2].number, 1.0f);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_pattern, compile_replace_number) {
+	const char *rule = "POW,VAR,(NUM) > MUL,$1,POW,-,-,VAR,[SUB,$1,NUM=1]";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 3;
+	expect_pattern.num_replace_nodes = 7;
+
+	expect_pattern.match[0].token_type = TOKEN_TYPE_OPERATOR_POW;
+	expect_pattern.match[1].token_type = TOKEN_TYPE_VAR;
+	expect_pattern.match[2].token_type = TOKEN_TYPE_NUM;
+
+	expect_pattern.replace[0].token_type = TOKEN_TYPE_OPERATOR_MUL;
+	expect_pattern.replace[1].token_type = TOKEN_TYPE_NONE;
+	expect_pattern.replace[2].token_type = TOKEN_TYPE_OPERATOR_POW;
+	expect_pattern.replace[3].token_type = TOKEN_TYPE_NONE;
+	expect_pattern.replace[4].token_type = TOKEN_TYPE_NONE;
+	expect_pattern.replace[5].token_type = TOKEN_TYPE_VAR;
+	expect_pattern.replace[6].token_type = TOKEN_TYPE_NONE;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	for (int i = 0; i < expect_pattern.num_match_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.match[i].token_type, pattern.match[i].token_type);
+	}
+
+	for (int i = 0; i < expect_pattern.num_replace_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.replace[i].token_type, pattern.replace[i].token_type);
+	}
+
+	TEST_ASSERT_NOT_NULL(pattern.replace[6].replacement);
+	TEST_ASSERT_EQ(pattern.replace[6].num_replacement_nodes, 3);
+	TEST_ASSERT_EQ(pattern.replace[6].replacement[0].token_type, TOKEN_TYPE_OPERATOR_SUB);
+	TEST_ASSERT_EQ(pattern.replace[6].replacement[1].token_type, TOKEN_TYPE_NONE);
+	TEST_ASSERT_EQ(pattern.replace[6].replacement[2].token_type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ(pattern.replace[6].replacement[2].has_number, 1);
+	TEST_ASSERT_EQ_DOUBLE(pattern.replace[6].replacement[2].number, 1.0f);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_pattern, compile_replace_only_number) {
+	const char *rule = "POW,(ANY),(NUM=0) > [NUM=1]";
+	pattern_t pattern;
+
+	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);
+
+	pattern_t expect_pattern;
+	expect_pattern.num_match_nodes = 3;
+	expect_pattern.num_replace_nodes = 1;
+
+	expect_pattern.match[0].token_type = TOKEN_TYPE_OPERATOR_POW;
+	expect_pattern.match[1].token_type = TOKEN_TYPE_ANY;
+	expect_pattern.match[2].token_type = TOKEN_TYPE_NUM;
+
+	expect_pattern.replace[0].token_type = TOKEN_TYPE_NONE;
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(pattern.num_match_nodes, expect_pattern.num_match_nodes);
+	TEST_ASSERT_EQ(pattern.num_replace_nodes, expect_pattern.num_replace_nodes);
+
+	for (int i = 0; i < expect_pattern.num_match_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.match[i].token_type, pattern.match[i].token_type);
+	}
+
+	for (int i = 0; i < expect_pattern.num_replace_nodes; i++) {
+		TEST_ASSERT_EQ(expect_pattern.replace[i].token_type, pattern.replace[i].token_type);
+	}
+
+	TEST_ASSERT_NOT_NULL(pattern.replace[0].replacement);
+	TEST_ASSERT_EQ(pattern.replace[0].num_replacement_nodes, 1);
+	TEST_ASSERT_EQ(pattern.replace[0].replacement[0].token_type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ(pattern.replace[0].replacement[0].has_number, 1);
+	TEST_ASSERT_EQ_DOUBLE(pattern.replace[0].replacement[0].number, 1.0f);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_pattern, match_simple) {
 	const char *rule = "MUL,MUL,(ANY),(NUM),(NUM),-,- > MUL,[MUL,$2,$3],$1";
 	pattern_t pattern;
@@ -283,6 +401,9 @@ TEST_DEF(test_pattern, generate_simple) {
 
 TEST_RUNNER(test_pattern) {
 	TEST_REG(test_pattern, compile_simple);
+	TEST_REG(test_pattern, compile_match_number);
+	TEST_REG(test_pattern, compile_replace_number);
+	TEST_REG(test_pattern, compile_replace_only_number);
 	TEST_REG(test_pattern, match_simple);
 	TEST_REG(test_pattern, capture_simple);
 	TEST_REG(test_pattern, replace_simple);

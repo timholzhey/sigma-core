@@ -15,6 +15,7 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/const
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/transform
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lexer
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/parser
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess
@@ -38,6 +39,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lang_def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/evaluator.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/const/eval_const.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/transform/eval_transform.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess/preprocess.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl/func_derive.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c

@@ -88,8 +88,8 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 	// Insert implicit multiplication operator
 	for (int i = 1; i < *num_tokens_out; i++) {
 		// Find matching pair
-		if (token_flags_map[tokens_out[i].type] & TOKEN_FLAG_IMPL_MULT_BEFORE &&
-			token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_IMPL_MULT_AFTER) {
+		if (token_flags_map[tokens_out[i].type] & TOKEN_FLAG_IMPL_MUL_BEFORE &&
+			token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_IMPL_MUL_AFTER) {
 			if (*num_tokens_out + 1 > max_num_tokens_out) {
 				error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
 				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");

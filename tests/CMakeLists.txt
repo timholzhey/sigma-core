@@ -6,6 +6,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/lang_def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/evaluator.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/const/eval_const.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/eval/transform/eval_transform.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/preprocess/preprocess.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl/func_derive.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c
@@ -27,6 +28,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_stringify.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_pattern.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_func_const.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_func_derive.c
 )
 
 target_link_libraries(run_tests m)

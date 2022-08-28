@@ -16,13 +16,20 @@ static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx
 	}
 
 	pattern_node_t *node = &pattern_nodes[node_idx];
-	switch (pattern_nodes[node_idx].type) {
+	switch (node->type) {
 		case PATTERN_NODE_TYPE_MATCH_TOKEN:
-			ast->token.type = pattern_nodes[node_idx].token_type;
+			ast->token.type = node->token_type;
+			ast->left = NULL;
+			ast->right = NULL;
+
+			if (node->has_number == 1) {
+				ast->token.value_type = TOKEN_VALUE_TYPE_NUMBER;
+				ast->token.value.number = node->number;
+			}
 			break;
 
 		case PATTERN_NODE_TYPE_REPLACE_TOKEN: {
-			int capture_idx = pattern_nodes[node_idx].capture_idx;
+			int capture_idx = node->capture_idx;
 			if (capture_idx < 0 || capture_idx >= num_capture_groups) {
 				log_error("Invalid capture group replacement index");
 				return RETVAL_ERROR;
@@ -33,12 +40,12 @@ static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx
 		break;
 
 		case PATTERN_NODE_TYPE_REPLACE_EVAL_TOKEN:
-			if (pattern_nodes[node_idx].num_replacement_nodes == 0) {
+			if (node->num_replacement_nodes == 0) {
 				log_error("Cannot replace with no nodes provided");
 				return RETVAL_ERROR;
 			}
-			if (pattern_replace_node(pattern_nodes[node_idx].replacement, 0,
-									 pattern_nodes[node_idx].num_replacement_nodes, capture_nodes, num_capture_groups,
+			if (pattern_replace_node(node->replacement, 0,
+									 node->num_replacement_nodes, capture_nodes, num_capture_groups,
 									 ast) != RETVAL_OK) {
 				log_error("Failed to build replacement node");
 				return RETVAL_ERROR;
@@ -46,7 +53,7 @@ static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx
 			break;
 
 		default:
-			log_error("Unhandled pattern node type %u", pattern_nodes[node_idx].type);
+			log_error("Unhandled pattern node type %u", node->type);
 			return RETVAL_ERROR;
 	}
 

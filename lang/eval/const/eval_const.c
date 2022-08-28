@@ -50,9 +50,7 @@ retval_t eval_const(ast_node_t *ast) {
 			break;
 
 		case TOKEN_TYPE_OPERATOR_MUL:
-			if (!(ast->left && ast->left->token.type == TOKEN_TYPE_NUM && ast->right &&
-				  ast->right->token.type == TOKEN_TYPE_NUM)) {
-				break; }
+			EXPECT_LR_NUMBERS;
 			ast->token.value.number = ast->left->token.value.number * ast->right->token.value.number;
 			RESULT_NUMBER;
 			break;

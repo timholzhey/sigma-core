@@ -64,7 +64,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 
 	ast_node_t ast_in = {0};
 
-	retval_t parse_ret = lang_parse(tokens, num_tokens, &ast_in);
+	retval_t parse_ret = lang_parse(processed_tokens, num_processed_tokens, &ast_in);
 	if (parse_ret != RETVAL_OK) {
 		log_error("Error: Parser returned %s (%d)\n", retval_string[parse_ret], parse_ret);
 	}

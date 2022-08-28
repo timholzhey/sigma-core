@@ -76,6 +76,12 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 				continue;
 			}
 
+			// Check begin scope
+			if (token_flags_map[token.type] & TOKEN_FLAG_BEGIN_SCOPE) {
+				nesting_stack[nesting_level++] = current;
+				continue;
+			}
+
 			PARSER_HANDLE_MALLOC(current->left = calloc(1, sizeof(ast_node_t)));
 			memcpy(&current->left->token, &token, sizeof(token_t));
 
@@ -85,12 +91,14 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 				token_t tmp = current->token;
 				current->token = current->left->token;
 				current->left->token = tmp;
+				continue;
 			}
 
 			// Check finished
 			if (token_flags_map[token.type] & TOKEN_FLAG_PREFIX ||
 				token_flags_map[token.type] & TOKEN_FLAG_POSTFIX) {
 				current->right = m_parser.fill;
+				continue;
 			}
 
 			continue;

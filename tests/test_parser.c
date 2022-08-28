@@ -190,6 +190,52 @@ TEST_DEF(test_parser, simple_parentheses_2) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_parser, simple_parentheses_3) {
+	int num_tokens = 7;
+	token_t tokens[num_tokens];
+	tokens[0].type = TOKEN_TYPE_NUM;
+	tokens[0].value.number = 2;
+	tokens[1].type = TOKEN_TYPE_OPERATOR_MUL;
+	tokens[2].type = TOKEN_TYPE_PAREN_OPEN;
+	tokens[3].type = TOKEN_TYPE_VAR;
+	tokens[4].type = TOKEN_TYPE_OPERATOR_POW;
+	tokens[5].type = TOKEN_TYPE_NUM;
+	tokens[5].value.number = 3;
+	tokens[6].type = TOKEN_TYPE_PAREN_CLOSE;
+	ast_node_t ast = {0};
+
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+	TEST_ASSERT_EQ(ast.token.type, TOKEN_TYPE_OPERATOR_MUL);
+	TEST_ASSERT_EQ(ast.left->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ(ast.right->token.type, TOKEN_TYPE_OPERATOR_POW);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_parser, simple_parentheses_sin) {
+	int num_tokens = 4;
+	token_t tokens[num_tokens];
+	tokens[0].type = TOKEN_TYPE_FUNC_SIN;
+	tokens[1].type = TOKEN_TYPE_PAREN_OPEN;
+	tokens[2].type = TOKEN_TYPE_VAR;
+	tokens[3].type = TOKEN_TYPE_PAREN_CLOSE;
+	ast_node_t ast = {0};
+
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+	TEST_ASSERT_EQ(ast.token.type, TOKEN_TYPE_FUNC_SIN);
+	TEST_ASSERT_EQ(ast.left->token.type, TOKEN_TYPE_VAR);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_parser, complex) {
 	const char *str = "x+1.5/sin(x)";
 	token_t tokens[1000];
@@ -235,5 +281,7 @@ TEST_RUNNER(test_parser) {
 	TEST_REG(test_parser, simple_surround);
 	TEST_REG(test_parser, simple_parentheses);
 	TEST_REG(test_parser, simple_parentheses_2);
+	TEST_REG(test_parser, simple_parentheses_3);
+	TEST_REG(test_parser, simple_parentheses_sin);
 	TEST_REG(test_parser, complex);
 }
