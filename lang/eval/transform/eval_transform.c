@@ -23,3 +23,27 @@ retval_t eval_transform_node(ast_node_t *ast, pattern_registry_t *registry) {
 
 	return RETVAL_OK;
 }
+
+retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *registry) {
+	if ((ast->token.type == TOKEN_TYPE_OPERATOR_ADD || ast->token.type == TOKEN_TYPE_OPERATOR_SUB ||
+		 ast->token.type == TOKEN_TYPE_OPERATOR_MUL) && ((ast->left && ast->left->token.type == TOKEN_TYPE_NUM) ||
+														 (ast->right && ast->right->token.type != TOKEN_TYPE_NUM))) {
+		if (ast->left) {
+			if (pattern_registry_apply_all(ast->left, registry) != RETVAL_OK) {
+				return RETVAL_ERROR;
+			}
+		}
+
+		if (ast->right) {
+			if (pattern_registry_apply_all(ast->right, registry) != RETVAL_OK) {
+				return RETVAL_ERROR;
+			}
+		}
+	}
+
+	if (pattern_registry_apply_all(ast, registry) != RETVAL_OK) {
+		return RETVAL_ERROR;
+	}
+
+	return RETVAL_OK;
+}

@@ -17,7 +17,7 @@ retval_t func_derive(ast_node_t *ast_in, ast_node_t *ast_out) {
 		return RETVAL_ERROR;
 	}
 
-	if (eval_transform_node(ast_out, &derive_registry) != RETVAL_OK) {
+	if (eval_transform_function_node(ast_out, &derive_registry) != RETVAL_OK) {
 		log_error("Error during derive transform");
 		return RETVAL_ERROR;
 	}

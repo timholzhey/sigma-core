@@ -58,6 +58,11 @@ retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registr
 }
 
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule) {
+	if (registry == NULL || name == NULL || rule == NULL) {
+		log_error("Invalid arguments");
+		return RETVAL_ERROR;
+	}
+
 	if (registry->num_patterns + 1 > MAX_NUM_PATTERNS_REGISTRY) {
 		log_error("Cannot add pattern to registry: Maximum patterns in registry exceeded!");
 		return RETVAL_ERROR;
@@ -68,6 +73,8 @@ retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *nam
 		return RETVAL_ERROR;
 	}
 
+	registry->patterns[registry->num_patterns].name = name;
+
 	pattern_t patterns[100];
 	int num_patterns = 0;
 	if (pattern_generate(&registry->patterns[registry->num_patterns], patterns, &num_patterns, 100) != RETVAL_OK) {
@@ -75,7 +82,6 @@ retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *nam
 		return RETVAL_ERROR;
 	}
 
-	registry->patterns[registry->num_patterns].name = name;
 	registry->num_patterns++;
 
 	memcpy(&registry->patterns[registry->num_patterns], patterns, num_patterns * sizeof(pattern_t));

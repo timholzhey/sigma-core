@@ -10,4 +10,6 @@
 
 retval_t eval_transform_node(ast_node_t *ast, pattern_registry_t *registry);
 
+retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *registry);
+
 #endif //SIGMA_CORE_EVAL_TRANSFORM_H

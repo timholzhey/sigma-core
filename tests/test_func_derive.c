@@ -49,7 +49,21 @@ TEST_DEF(test_func_derive, sin_simple) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
-TEST_DEF(test_func_derive, constant) {
+TEST_DEF(test_func_derive, sin_add_constants) {
+	sigma_init();
+
+	const char *func = "sin(x)+5+2";
+	const char *expect_result = "cos(x)";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
+TEST_DEF(test_func_derive, var_plus_constant) {
 	sigma_init();
 
 	const char *func = "x+2";
@@ -63,9 +77,25 @@ TEST_DEF(test_func_derive, constant) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_func_derive, constant) {
+	sigma_init();
+
+	const char *func = "5";
+	const char *expect_result = "0";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_RUNNER(test_func_derive) {
 	TEST_REG(test_func_derive, exponent_simple);
 	TEST_REG(test_func_derive, exponent_simple2);
 	TEST_REG(test_func_derive, sin_simple);
+	TEST_REG(test_func_derive, sin_add_constants);
+	TEST_REG(test_func_derive, var_plus_constant);
 	TEST_REG(test_func_derive, constant);
 }
