@@ -52,6 +52,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/replace/pattern_replace.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/capture/pattern_capture.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/generate/pattern_generate.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/io.c
 )
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)

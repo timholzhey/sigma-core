@@ -5,18 +5,21 @@
 #ifndef SIGMA_CORE_PATTERN_H
 #define SIGMA_CORE_PATTERN_H
 
+#include <stdbool.h>
 #include "lang_def.h"
 
 #define MAX_NUM_CAPTURE_GROUPS		9
 #define MAX_NUM_MATCH_NODES			100
 #define MAX_NUM_REPLACE_NODES		100
 #define MAX_NUM_PATTERNS_REGISTRY	100
+#define MAX_PATTERN_NAME_LEN		50
 
 typedef enum {
 	PATTERN_NODE_TYPE_MATCH_TOKEN,
 	PATTERN_NODE_TYPE_CAPTURE_TOKEN,
 	PATTERN_NODE_TYPE_REPLACE_TOKEN,
 	PATTERN_NODE_TYPE_REPLACE_EVAL_TOKEN,
+	PATTERN_NODE_TYPE_REPLACE_ERROR,
 } pattern_node_type_t;
 
 struct pattern_node_t {
@@ -26,6 +29,8 @@ struct pattern_node_t {
 	uint8_t num_replacement_nodes;
 	pattern_node_type_t type;
 	uint8_t has_number:1;
+	char *error_desc;
+	uint8_t error_desc_len;
 	double number;
 };
 typedef struct pattern_node_t pattern_node_t;
@@ -35,7 +40,7 @@ typedef struct {
 	pattern_node_t replace[MAX_NUM_REPLACE_NODES];
 	int num_match_nodes;
 	int num_replace_nodes;
-	const char *name;
+	char name[MAX_PATTERN_NAME_LEN];
 } pattern_t;
 
 typedef struct {
@@ -44,9 +49,9 @@ typedef struct {
 	const char *name;
 } pattern_registry_t;
 
-retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern);
+retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied);
 
-retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry);
+retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied);
 
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule);
 

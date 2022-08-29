@@ -3,6 +3,8 @@
 //
 
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 #include "stringify.h"
 #include "logging.h"
 #include "lexer.h"
@@ -12,6 +14,12 @@
 	log_error(__VA_ARGS__); \
 	return RETVAL_ERROR; \
 }
+
+static struct {
+	bool is_error;
+	char error_desc[TOKEN_MAX_STR_IDENT_LENGTH];
+	int error_desc_len;
+} m_stringify;
 
 int stringify_node(ast_node_t *ast, char *string, int size_left) {
 	int chars_written = 0;
@@ -43,6 +51,12 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 				chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
 			}
 			break;
+
+		case TOKEN_TYPE_ERR:
+			m_stringify.is_error = true;
+			memcpy(m_stringify.error_desc, ast->token.value.identifier, ast->token.value.identifier_len);
+			m_stringify.error_desc_len = ast->token.value.identifier_len;
+			return chars_written;
 
 		default:
 			chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
@@ -78,7 +92,13 @@ retval_t lang_stringify(ast_node_t *ast, char **string, int *str_len) {
 		STRINGIFIER_FAIL_WITH_MSG("Could not allocate memory for string");
 	}
 
+	m_stringify.is_error = false;
+
 	*str_len = stringify_node(ast, *string, max_str_len);
+
+	if (m_stringify.is_error) {
+		memcpy(*string, m_stringify.error_desc, m_stringify.error_desc_len);
+	}
 
 	return RETVAL_OK;
 }

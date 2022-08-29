@@ -13,6 +13,7 @@
 typedef enum {
 	TOKEN_TYPE_NONE,
 	TOKEN_TYPE_ANY,
+	TOKEN_TYPE_ERR,
 	TOKEN_TYPE_OPERATOR_ADD,
 	TOKEN_TYPE_OPERATOR_SUB,
 	TOKEN_TYPE_OPERATOR_MUL,
@@ -37,12 +38,14 @@ typedef enum {
 	TOKEN_TYPE_PAREN_CLOSE,
 	TOKEN_TYPE_VAR,
 	TOKEN_TYPE_NUM,
+	TOKEN_TYPE_CONST_E,
 	TOKEN_TYPE_COUNT,
 } token_type_t;
 
 typedef struct {
 	double number;
 	char identifier[TOKEN_MAX_STR_IDENT_LENGTH];
+	uint8_t identifier_len;
 } token_value_t;
 
 typedef enum {

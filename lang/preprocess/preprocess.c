@@ -95,7 +95,7 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");
 			}
 
-			for (int j = *num_tokens_out - 1; j > i; j--) {
+			for (int j = *num_tokens_out - 1; j >= i; j--) {
 				tokens_out[j + 1] = tokens_out[j];
 			}
 

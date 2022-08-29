@@ -13,7 +13,7 @@
 #include <pattern_compile.h>
 #include <pattern_generate.h>
 
-retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern) {
+retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 	if (ast == NULL || pattern == NULL) {
 		log_error("Invalid arguments");
 		return RETVAL_ERROR;
@@ -44,13 +44,18 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern) {
 		return RETVAL_ERROR;
 	}
 
+	*applied = true;
+
 	return RETVAL_OK;
 }
 
-retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry) {
+retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied) {
 	for (int i = 0; i < registry->num_patterns; i++) {
-		if (pattern_apply(ast, &registry->patterns[i]) != RETVAL_OK) {
+		if (pattern_apply(ast, &registry->patterns[i], applied) != RETVAL_OK) {
 			return RETVAL_ERROR;
+		}
+		if (*applied) {
+			return RETVAL_OK;
 		}
 	}
 
@@ -60,6 +65,14 @@ retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registr
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule) {
 	if (registry == NULL || name == NULL || rule == NULL) {
 		log_error("Invalid arguments");
+		return RETVAL_ERROR;
+	}
+
+	uint32_t name_len = strlen(name);
+	uint32_t registry_name_len = strlen(registry->name);
+
+	if (registry_name_len + 1 + name_len> MAX_PATTERN_NAME_LEN) {
+		log_error("Pattern name too large");
 		return RETVAL_ERROR;
 	}
 
@@ -73,7 +86,14 @@ retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *nam
 		return RETVAL_ERROR;
 	}
 
-	registry->patterns[registry->num_patterns].name = name;
+	memcpy(registry->patterns[registry->num_patterns].name, registry->name, registry_name_len);
+	memcpy(registry->patterns[registry->num_patterns].name + registry_name_len, "_", 1);
+	memcpy(registry->patterns[registry->num_patterns].name + registry_name_len + 1, name, strlen(name));
+
+	if (!pattern_compile_is_permutation_allowed()) {
+		registry->num_patterns++;
+		return RETVAL_OK;
+	}
 
 	pattern_t patterns[100];
 	int num_patterns = 0;

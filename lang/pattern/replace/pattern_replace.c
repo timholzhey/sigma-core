@@ -52,6 +52,12 @@ static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx
 			}
 			break;
 
+		case PATTERN_NODE_TYPE_REPLACE_ERROR:
+			ast->token.type = TOKEN_TYPE_ERR;
+			ast->token.value.identifier_len = node->error_desc_len;
+			memcpy(ast->token.value.identifier, node->error_desc, node->error_desc_len);
+			break;
+
 		default:
 			log_error("Unhandled pattern node type %u", node->type);
 			return RETVAL_ERROR;

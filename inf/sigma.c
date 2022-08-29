@@ -51,6 +51,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 	retval_t lex_ret = lang_lex(func_str, tokens, &num_tokens, MAX_NUM_TOKENS);
 	if (lex_ret != RETVAL_OK) {
 		log_error("Error: Lexer returned %s (%d)\n", retval_string[lex_ret], lex_ret);
+		return "ERR";
 	}
 
 	token_t processed_tokens[MAX_NUM_TOKENS];
@@ -60,6 +61,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 											  MAX_NUM_TOKENS);
 	if (preprocess_ret != RETVAL_OK) {
 		log_error("Error: Preprocessor returned %s (%d)\n", retval_string[preprocess_ret], preprocess_ret);
+		return "ERR";
 	}
 
 	ast_node_t ast_in = {0};
@@ -67,6 +69,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 	retval_t parse_ret = lang_parse(processed_tokens, num_processed_tokens, &ast_in);
 	if (parse_ret != RETVAL_OK) {
 		log_error("Error: Parser returned %s (%d)\n", retval_string[parse_ret], parse_ret);
+		return "ERR";
 	}
 
 	ast_node_t ast_out = {0};
@@ -74,6 +77,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 	retval_t eval_ret = lang_eval(&ast_in, &ast_out, sigma_func);
 	if (eval_ret != RETVAL_OK) {
 		log_error("Error: Evaluator returned %s (%d)\n", retval_string[eval_ret], eval_ret);
+		return "ERR";
 	}
 
 	char *string = NULL;
@@ -82,6 +86,7 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 	retval_t string_ret = lang_stringify(&ast_out, &string, &str_len);
 	if (string_ret != RETVAL_OK) {
 		log_error("Error: Stringifier returned %s (%d)\n", retval_string[string_ret], string_ret);
+		return "ERR";
 	}
 
 	return string;

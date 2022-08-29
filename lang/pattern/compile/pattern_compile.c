@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+static bool allow_permutation = false;
+
 retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) {
 	if (rule == NULL || rule_len == 0 || pattern == NULL) {
 		log_error("Invalid arguments");
@@ -15,9 +17,9 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	}
 
 	memset(pattern, 0, sizeof(pattern_t));
-	char tok_buf[16];
+	char tok_buf[50];
 	int tok_buf_pos = 0;
-	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false, was_access_capture = false;
+	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false, was_access_capture = false, do_error = false;
 	pattern_node_t *pattern_nodes = pattern->match;
 	pattern_node_t replacement_nodes[100];
 	int *pattern_node_pos = &pattern->num_match_nodes;
@@ -25,8 +27,15 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	int capture_index = 0;
 	pattern_node_t *store_node;
 	int *store_node_pos;
+	allow_permutation = true;
 
 	for (int i = 0; i < rule_len; i++) {
+		if (rule[i] == '~') {
+			allow_permutation = false;
+			tok_buf_pos = 0;
+			continue;
+		}
+
 		if (rule[i] == '(' && !do_capture && !do_eval) {
 			do_capture = true;
 			tok_buf_pos = 0;
@@ -120,8 +129,8 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			continue;
 		}
 
-		if ((rule[i] == ',' || rule[i] == ' ' || rule[i] == '>' || (rule[i] == ')' && do_capture) ||
-			 (rule[i] == '=' && (do_capture || do_eval))) && tok_buf_pos > 0) {
+		if ((rule[i] == ',' || (rule[i] == ' ' && !do_error) || rule[i] == '>' || rule[i] == ':' || (rule[i] == ')' && do_capture) ||
+			 (rule[i] == '=' && (do_capture || do_eval)) || i == rule_len - 1) && tok_buf_pos > 0) {
 			pattern_nodes[*pattern_node_pos].type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 
 			if (do_match_number) {
@@ -148,6 +157,34 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 						do_match_number = true;
 					}
 				}
+			}
+
+			if (do_error) {
+				do_error = false;
+				tok_buf[tok_buf_pos++] = rule[i];
+				store_node->type = PATTERN_NODE_TYPE_REPLACE_ERROR;
+				store_node->token_type = TOKEN_TYPE_ERR;
+				store_node->error_desc = malloc(tok_buf_pos + 1);
+				if (store_node->error_desc == NULL) {
+					log_error("Could not allocate memory for error description");
+					return RETVAL_ERROR;
+				}
+				const char *err = "Error: ";
+				uint32_t err_len = strlen(err);
+				memcpy(store_node->error_desc, err, err_len);
+				memcpy(store_node->error_desc + err_len, tok_buf, tok_buf_pos);
+				store_node->error_desc[tok_buf_pos + err_len + 1] = '\0';
+				store_node->error_desc_len = tok_buf_pos + err_len;
+				(*store_node_pos)++;
+
+				tok_buf_pos = 0;
+				continue;
+			}
+
+			if (memcmp(tok_buf, "ERR", tok_buf_pos) == 0) {
+				do_error = true;
+				tok_buf_pos = 0;
+				continue;
 			}
 
 			bool match_token = false;
@@ -181,7 +218,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			continue;
 		}
 
-		if (rule[i] == ' ' || rule[i] == '\t') {
+		if ((rule[i] == ' ' && (!do_error || tok_buf_pos == 0)) || rule[i] == '\t') {
 			tok_buf_pos = 0;
 			continue;
 		}
@@ -197,4 +234,8 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	}
 
 	return RETVAL_OK;
+}
+
+bool pattern_compile_is_permutation_allowed() {
+	return allow_permutation;
 }

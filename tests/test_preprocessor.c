@@ -115,6 +115,7 @@ TEST_DEF(test_preprocessor, implicit_multiplication) {
 	int num_tokens_in = 2;
 	token_t tokens_in[num_tokens_in];
 	tokens_in[0].type = TOKEN_TYPE_NUM;
+	tokens_in[0].value.number = 5.0f;
 	tokens_in[1].type = TOKEN_TYPE_VAR;
 	int num_tokens_out = 0;
 	token_t tokens_out[1000];
@@ -131,6 +132,8 @@ TEST_DEF(test_preprocessor, implicit_multiplication) {
 	for (int i = 0; i < num_tokens_out; i++) {
 		TEST_ASSERT_EQ(tokens_out[i].type, expect_token_types[i]);
 	}
+
+	TEST_ASSERT_EQ_DOUBLE(tokens_out[0].value.number, 5.0f);
 
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
