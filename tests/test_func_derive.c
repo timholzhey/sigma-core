@@ -119,6 +119,20 @@ TEST_DEF(test_func_derive, var_plus_var) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_func_derive, var_plus_var_power) {
+	sigma_init();
+
+	const char *func = "x+x^2";
+	const char *expect_result = "2x+1";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_func_derive, var) {
 	sigma_init();
 
@@ -226,6 +240,7 @@ TEST_RUNNER(test_func_derive) {
 	TEST_REG(test_func_derive, var_plus_constant);
 	TEST_REG(test_func_derive, var_mult_constant);
 	TEST_REG(test_func_derive, var_plus_var);
+	TEST_REG(test_func_derive, var_plus_var_power);
 	TEST_REG(test_func_derive, var);
 	TEST_REG(test_func_derive, constant);
 	TEST_REG(test_func_derive, log);

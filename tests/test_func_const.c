@@ -189,6 +189,20 @@ TEST_DEF(test_func_const, multiply_var_var) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_func_const, add_var_multiples) {
+	sigma_init();
+
+	const char *func = "2x+3x";
+	const char *expect_result = "5x";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_CONST);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_func_const, multiply_var_powers) {
 	sigma_init();
 
@@ -273,6 +287,7 @@ TEST_RUNNER(test_func_const) {
 	TEST_REG(test_func_const, multiply_zero);
 	TEST_REG(test_func_const, multiply_one);
 	TEST_REG(test_func_const, multiply_var_var);
+	TEST_REG(test_func_const, add_var_multiples);
 	TEST_REG(test_func_const, multiply_var_powers);
 	TEST_REG(test_func_const, divide_by_one);
 	TEST_REG(test_func_const, divide_by_zero);

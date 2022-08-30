@@ -34,9 +34,12 @@ retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *regis
 		propagate = true;
 	}
 
-	if (pattern_registry_apply_all(ast, registry, &applied, &propagate) != RETVAL_OK) {
-		return RETVAL_ERROR;
+	if (!((ast->token.type == TOKEN_TYPE_OPERATOR_ADD || ast->token.type == TOKEN_TYPE_OPERATOR_SUB) && ast->left && ast->right)) {
+		if (pattern_registry_apply_all(ast, registry, &applied, &propagate) != RETVAL_OK) {
+			return RETVAL_ERROR;
+		}
 	}
+
 
 	if (applied && propagate && allow_propagation) {
 		if (ast->left) {

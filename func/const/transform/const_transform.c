@@ -21,6 +21,7 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "DIV_BY_0", "~DIV,(ANY),(NUM=0) > ERR: Division by zero");
 	pattern_registry_add_rule(&const_registry, "VAR_MUL", "MUL,VAR,VAR > POW,VAR,[NUM=2]");
 	pattern_registry_add_rule(&const_registry, "VAR_ADD", "ADD,VAR,VAR > MUL,[NUM=2],VAR");
+	pattern_registry_add_rule(&const_registry, "VAR_ADD_MULTIPLES", "ADD,MUL,MUL,(NUM),VAR,(NUM),VAR > MUL,[ADD,$1,$2],VAR");
 	pattern_registry_add_rule(&const_registry, "VAR_SUB", "SUB,VAR,VAR > [NUM=0]");
 	pattern_registry_add_rule(&const_registry, "VAR_DIV", "DIV,VAR,VAR > [NUM=1]");
 	pattern_registry_add_rule(&const_registry, "VAR_MUL_POWERS", "MUL,POW,POW,VAR,(NUM),VAR,(NUM) > POW,VAR,[ADD,$1,$2]");

@@ -22,7 +22,12 @@
 	printf("%s", LOG_COLOR_RESET); \
 }
 
+#ifdef DEBUG_GLOBAL
 #define log_debug(...)				log_internal(LOG_COLOR_RESET, __VA_ARGS__);
+#else
+#define log_debug(...)
+#endif
+
 #define log_error(...)				log_internal(LOG_COLOR_RED, __VA_ARGS__);
 #define log_error_noterm(...)		log_internal_noterm(LOG_COLOR_RED, __VA_ARGS__);
 
