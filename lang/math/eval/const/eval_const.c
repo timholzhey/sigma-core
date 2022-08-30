@@ -63,7 +63,7 @@ retval_t eval_const(ast_node_t *ast) {
 
 		case TOKEN_TYPE_OPERATOR_POW:
 			EXPECT_LR_NUMBERS;
-			ast->token.value.number = ast->left->token.value.number + ast->right->token.value.number;
+			ast->token.value.number = pow(ast->left->token.value.number, ast->right->token.value.number);
 			RESULT_NUMBER;
 			break;
 

@@ -115,6 +115,9 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 				// Find boundaries left and right
 				int left_bound = 0;
 				for (int j = i; j > 0; j--) {
+					if (tokens_out[j].type == TOKEN_TYPE_PAREN_CLOSE) {
+						break;
+					}
 					if (token_precedence_map[tokens_out[j].type] > prec && token_precedence_map[tokens_out[j].type] != TOKEN_PRECEDENCE_NONE) {
 						left_bound = j + 1;
 						break;
@@ -123,6 +126,9 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 
 				int right_bound = *num_tokens_out - 1;
 				for (int j = i; j < *num_tokens_out; j++) {
+					if (tokens_out[j].type == TOKEN_TYPE_PAREN_OPEN) {
+						break;
+					}
 					if (token_precedence_map[tokens_out[j].type] > prec && token_precedence_map[tokens_out[j].type] != TOKEN_PRECEDENCE_NONE) {
 						right_bound = j - 1;
 						break;

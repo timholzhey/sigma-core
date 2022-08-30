@@ -49,12 +49,16 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 	return RETVAL_OK;
 }
 
-retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied) {
+retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied, bool *propagate) {
 	for (int i = 0; i < registry->num_patterns; i++) {
+		if (registry->patterns[i].do_propagate && *propagate) {
+			continue;
+		}
 		if (pattern_apply(ast, &registry->patterns[i], applied) != RETVAL_OK) {
 			return RETVAL_ERROR;
 		}
 		if (*applied) {
+			*propagate |= registry->patterns[i].do_propagate;
 			return RETVAL_OK;
 		}
 	}

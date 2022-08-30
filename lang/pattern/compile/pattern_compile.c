@@ -19,7 +19,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	memset(pattern, 0, sizeof(pattern_t));
 	char tok_buf[50];
 	int tok_buf_pos = 0;
-	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false, was_access_capture = false, do_error = false;
+	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false, was_access_capture = false, do_error = false, do_invert = false;
 	pattern_node_t *pattern_nodes = pattern->match;
 	pattern_node_t replacement_nodes[100];
 	int *pattern_node_pos = &pattern->num_match_nodes;
@@ -36,6 +36,10 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			continue;
 		}
 
+		if (rule[i] == '@') {
+			pattern->do_propagate = 1;
+		}
+
 		if (rule[i] == '(' && !do_capture && !do_eval) {
 			do_capture = true;
 			tok_buf_pos = 0;
@@ -50,6 +54,12 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 
 		if (rule[i] == '$') {
 			do_access_capture = true;
+			tok_buf_pos = 0;
+			continue;
+		}
+
+		if (rule[i] == '!') {
+			do_invert = true;
 			tok_buf_pos = 0;
 			continue;
 		}
@@ -80,6 +90,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 					do_match_number = false;
 					store_node->type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 					store_node->has_number = 1;
+					store_node->is_inverted = do_invert;
 					tok_buf[tok_buf_pos] = '\0';
 					store_node->number = strtod(tok_buf, NULL);
 
@@ -102,12 +113,14 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				memcpy(pattern_nodes[*pattern_node_pos].replacement, replacement_nodes, replacement_node_pos * sizeof(pattern_node_t));
 				pattern_nodes[*pattern_node_pos].num_replacement_nodes = replacement_node_pos;
 				do_eval = false;
+				do_invert = false;
 				tok_buf_pos = 0;
 				replacement_node_pos = 0;
 				(*pattern_node_pos)++;
 				i++;
 				continue;
 			}
+
 			if (was_access_capture) {
 				was_access_capture = false;
 				tok_buf_pos = 0;
@@ -124,6 +137,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			store_node->capture_idx = rule[i] - '1';
 			(*store_node_pos)++;
 			do_access_capture = false;
+			do_invert = false;
 			tok_buf_pos = 0;
 			i++;
 			continue;
@@ -132,6 +146,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 		if ((rule[i] == ',' || (rule[i] == ' ' && !do_error) || rule[i] == '>' || rule[i] == ':' || (rule[i] == ')' && do_capture) ||
 			 (rule[i] == '=' && (do_capture || do_eval)) || i == rule_len - 1) && tok_buf_pos > 0) {
 			pattern_nodes[*pattern_node_pos].type = PATTERN_NODE_TYPE_MATCH_TOKEN;
+			store_node->is_inverted = do_invert;
 
 			if (do_match_number) {
 				do_match_number = false;
@@ -148,6 +163,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 
 				tok_buf_pos = 0;
 				(*store_node_pos)++;
+				i++;
 				continue;
 			}
 
@@ -213,6 +229,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				i++;
 			}
 
+			do_invert = false;
 			tok_buf_pos = 0;
 			(*store_node_pos)++;
 			continue;

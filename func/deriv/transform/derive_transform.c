@@ -11,11 +11,16 @@ void derive_transform_init() {
 	pattern_registry_add_rule(&derive_registry_gen1, "CONST_ADD", "ADD,(NUM),(ANY) > $2");
 	pattern_registry_add_rule(&derive_registry_gen1, "CONST_SUB", "SUB,(NUM),(ANY) > $2");
 
+	pattern_registry_add_rule(&derive_registry_gen2, "CHAIN", "@(FUNC),(FUNC) > MUL,$1,$2");
+
 	pattern_registry_add_rule(&derive_registry_gen2, "VAR", "VAR > [NUM=1]");
 	pattern_registry_add_rule(&derive_registry_gen2, "CONST", "NUM > [NUM=0]");
-	pattern_registry_add_rule(&derive_registry_gen2, "POWER", "~POW,VAR,(NUM) > MUL,$1,POW,-,-,VAR,[SUB,$1,NUM=1]");
-	pattern_registry_add_rule(&derive_registry_gen2, "SIN", "SIN,VAR > COS,VAR,-");
-	pattern_registry_add_rule(&derive_registry_gen2, "COS", "COS,VAR > SUB,[NUM=0],SIN,-,-,VAR,-");
-	pattern_registry_add_rule(&derive_registry_gen2, "LOG", "LOG,VAR > DIV,[NUM=1],VAR");
-	pattern_registry_add_rule(&derive_registry_gen2, "E", "~POW,E,VAR > POW,E,VAR");
+	pattern_registry_add_rule(&derive_registry_gen2, "POWER", "~POW,(FUNC),(NUM) > MUL,$2,POW,-,-,$1,[SUB,$2,NUM=1]");
+	pattern_registry_add_rule(&derive_registry_gen2, "SIN", "~SIN,(FUNC) > COS,$1,-");
+	pattern_registry_add_rule(&derive_registry_gen2, "COS", "~COS,(FUNC) > SUB,[NUM=0],SIN,-,-,$1,-");
+	pattern_registry_add_rule(&derive_registry_gen2, "LOG", "~LOG,(FUNC) > DIV,[NUM=1],$1");
+	pattern_registry_add_rule(&derive_registry_gen2, "E", "~POW,E,(FUNC) > POW,E,$1");
+	pattern_registry_add_rule(&derive_registry_gen2, "SQRT", "~SQRT,(FUNC) > DIV,[NUM=1],MUL,-,-,[NUM=2],SQRT,-,-,-,-,-,-,$1");
+
+	pattern_registry_add_rule(&derive_registry_gen2, "VAR_MUL_CONST", "MUL,VAR,(NUM) > $1");
 }

@@ -29,6 +29,7 @@ struct pattern_node_t {
 	uint8_t num_replacement_nodes;
 	pattern_node_type_t type;
 	uint8_t has_number:1;
+	uint8_t is_inverted:1;
 	char *error_desc;
 	uint8_t error_desc_len;
 	double number;
@@ -41,6 +42,7 @@ typedef struct {
 	int num_match_nodes;
 	int num_replace_nodes;
 	char name[MAX_PATTERN_NAME_LEN];
+	uint8_t do_propagate:1;
 } pattern_t;
 
 typedef struct {
@@ -51,7 +53,7 @@ typedef struct {
 
 retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied);
 
-retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied);
+retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied, bool *propagate);
 
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule);
 

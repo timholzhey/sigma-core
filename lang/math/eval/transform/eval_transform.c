@@ -6,7 +6,7 @@
 #include "eval_transform.h"
 
 retval_t eval_transform_node(ast_node_t *ast, pattern_registry_t *registry) {
-	bool applied = false;
+	bool applied = false, propagate = false;
 
 	if (ast->left) {
 		if (eval_transform_node(ast->left, registry) != RETVAL_OK) {
@@ -20,21 +20,39 @@ retval_t eval_transform_node(ast_node_t *ast, pattern_registry_t *registry) {
 		}
 	}
 
-	if (pattern_registry_apply_all(ast, registry, &applied) != RETVAL_OK) {
+	if (pattern_registry_apply_all(ast, registry, &applied, &propagate) != RETVAL_OK) {
 		return RETVAL_ERROR;
 	}
 
 	return RETVAL_OK;
 }
 
-retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *registry) {
-	bool applied = false;
+retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *registry, bool allow_propagation) {
+	bool applied = false, propagate = false;
 
-	if (pattern_registry_apply_all(ast, registry, &applied) != RETVAL_OK) {
+	if (!allow_propagation) {
+		propagate = true;
+	}
+
+	if (pattern_registry_apply_all(ast, registry, &applied, &propagate) != RETVAL_OK) {
 		return RETVAL_ERROR;
 	}
 
-	if (applied) {
+	if (applied && propagate && allow_propagation) {
+		if (ast->left) {
+			if (eval_transform_function_node(ast->left, registry, false) != RETVAL_OK) {
+				return RETVAL_ERROR;
+			}
+		}
+
+		if (ast->right) {
+			if (eval_transform_function_node(ast->right, registry, false) != RETVAL_OK) {
+				return RETVAL_ERROR;
+			}
+		}
+	}
+
+	if (applied || !allow_propagation) {
 		return RETVAL_OK;
 	}
 
@@ -44,13 +62,13 @@ retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *regis
 		token_type_t right = ast->right->token.type;
 
 		if (left == TOKEN_TYPE_NUM || ast->token.type != TOKEN_TYPE_OPERATOR_MUL) {
-			if (eval_transform_function_node(ast->right, registry) != RETVAL_OK) {
+			if (eval_transform_function_node(ast->right, registry, true) != RETVAL_OK) {
 				return RETVAL_ERROR;
 			}
 		}
 
 		if (right == TOKEN_TYPE_NUM || ast->token.type != TOKEN_TYPE_OPERATOR_MUL) {
-			if (eval_transform_function_node(ast->left, registry) != RETVAL_OK) {
+			if (eval_transform_function_node(ast->left, registry, true) != RETVAL_OK) {
 				return RETVAL_ERROR;
 			}
 		}

@@ -28,12 +28,30 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 		chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
 	}
 
+	bool paren_precedence = false;
+	if ((token_flags_map[ast->token.type] & TOKEN_FLAG_INFIX) && ast->left &&
+		token_precedence_map[ast->token.type] <= token_precedence_map[ast->left->token.type] &&
+		token_precedence_map[ast->left->token.type] != TOKEN_PRECEDENCE_NONE &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_ADD && ast->left->token.type == TOKEN_TYPE_OPERATOR_ADD) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_ADD && ast->left->token.type == TOKEN_TYPE_OPERATOR_SUB) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_SUB && ast->left->token.type == TOKEN_TYPE_OPERATOR_ADD) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_MUL && ast->left->token.type == TOKEN_TYPE_OPERATOR_MUL)) {
+		paren_precedence = true;
+		chars_written += snprintf(string + chars_written, size_left - chars_written, "(");
+	}
+
 	if ((token_flags_map[ast->token.type] & TOKEN_FLAG_INFIX) ||
 		token_flags_map[ast->token.type] & TOKEN_FLAG_POSTFIX ||
 		token_flags_map[ast->token.type] & TOKEN_FLAG_SURROUND) {
-		if (ast->left && !(ast->token.type == TOKEN_TYPE_OPERATOR_SUB && ast->left->token.type == TOKEN_TYPE_NUM && ast->left->token.value.number == 0.0f)) {
+		if (ast->left && !(ast->token.type == TOKEN_TYPE_OPERATOR_SUB && ast->left->token.type == TOKEN_TYPE_NUM &&
+						   ast->left->token.value.number == 0.0f)) {
 			chars_written += stringify_node(ast->left, string + chars_written, size_left - chars_written);
 		}
+	}
+
+	if (paren_precedence) {
+		chars_written += snprintf(string + chars_written, size_left - chars_written, ")");
+		paren_precedence = false;
 	}
 
 	switch (ast->token.type) {
@@ -70,12 +88,28 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 		}
 	}
 
+	if ((token_flags_map[ast->token.type] & TOKEN_FLAG_INFIX) && ast->right &&
+		token_precedence_map[ast->token.type] <= token_precedence_map[ast->right->token.type] &&
+		token_precedence_map[ast->right->token.type] != TOKEN_PRECEDENCE_NONE &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_ADD && ast->right->token.type == TOKEN_TYPE_OPERATOR_ADD) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_ADD && ast->right->token.type == TOKEN_TYPE_OPERATOR_SUB) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_SUB && ast->right->token.type == TOKEN_TYPE_OPERATOR_ADD) &&
+		!(ast->token.type == TOKEN_TYPE_OPERATOR_MUL && ast->right->token.type == TOKEN_TYPE_OPERATOR_MUL)) {
+		paren_precedence = true;
+		chars_written += snprintf(string + chars_written, size_left - chars_written, "(");
+	}
+
 	if (ast->right) {
 		chars_written += stringify_node(ast->right, string + chars_written, size_left - chars_written);
 	}
 
 	if ((token_flags_map[ast->token.type] & TOKEN_FLAG_PREFIX)) {
 		chars_written += snprintf(string + chars_written, size_left - chars_written, ")");
+	}
+
+	if (paren_precedence) {
+		chars_written += snprintf(string + chars_written, size_left - chars_written, ")");
+		paren_precedence = false;
 	}
 
 	return chars_written;

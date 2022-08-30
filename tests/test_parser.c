@@ -258,6 +258,32 @@ TEST_DEF(test_parser, simple_parentheses_sin2) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_parser, simple_parentheses_power) {
+	int num_tokens = 7;
+	token_t tokens[num_tokens];
+	tokens[0].type = TOKEN_TYPE_PAREN_OPEN;
+	tokens[1].type = TOKEN_TYPE_VAR;
+	tokens[2].type = TOKEN_TYPE_OPERATOR_ADD;
+	tokens[3].type = TOKEN_TYPE_NUM;
+	tokens[4].type = TOKEN_TYPE_PAREN_CLOSE;
+	tokens[5].type = TOKEN_TYPE_OPERATOR_POW;
+	tokens[6].type = TOKEN_TYPE_NUM;
+	ast_node_t ast = {0};
+
+	retval_t ret = lang_parse(tokens, num_tokens, &ast);
+	parser_error_t err = parser_errno();
+
+	TEST_ASSERT_EQ(ret, RETVAL_OK);
+	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
+	TEST_ASSERT_EQ(ast.token.type, TOKEN_TYPE_OPERATOR_POW);
+	TEST_ASSERT_EQ(ast.left->token.type, TOKEN_TYPE_OPERATOR_ADD);
+	TEST_ASSERT_EQ(ast.right->token.type, TOKEN_TYPE_NUM);
+	TEST_ASSERT_EQ(ast.left->left->token.type, TOKEN_TYPE_VAR);
+	TEST_ASSERT_EQ(ast.left->right->token.type, TOKEN_TYPE_NUM);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_parser, complex) {
 	const char *str = "x+1.5/sin(x)";
 	token_t tokens[1000];
@@ -306,5 +332,6 @@ TEST_RUNNER(test_parser) {
 	TEST_REG(test_parser, simple_parentheses_3);
 	TEST_REG(test_parser, simple_parentheses_sin);
 	TEST_REG(test_parser, simple_parentheses_sin2);
+	TEST_REG(test_parser, simple_parentheses_power);
 	TEST_REG(test_parser, complex);
 }

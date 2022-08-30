@@ -25,7 +25,7 @@ TEST_DEF(test_func_derive, exponent_simple2) {
 	sigma_init();
 
 	const char *func = "2*x^3";
-	const char *expect_result = "6*x^2"; // TODO: apply reverse precedence rules to simplify
+	const char *expect_result = "6*x^2";
 
 	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
 
@@ -161,6 +161,20 @@ TEST_DEF(test_func_derive, log) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_func_derive, sqrt) {
+	sigma_init();
+
+	const char *func = "sqrt(x)";
+	const char *expect_result = "1/(2sqrt(x))";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_func_derive, e_raise_x) {
 	sigma_init();
 
@@ -189,6 +203,20 @@ TEST_DEF(test_func_derive, chain_simple) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_func_derive, chain_chain_simple) {
+	sigma_init();
+
+	const char *func = "sin(sin(x))";
+	const char *expect_result = "cos(sin(x))*cos(x)";
+
+	const char *result = sigma_function(func, 'x', SIGMA_FUNCTION_DERIVE);
+
+	TEST_ASSERT_EQ_STRING(result, expect_result, strlen(expect_result));
+	TEST_ASSERT_EQ_U32(strlen(result), strlen(expect_result));
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_RUNNER(test_func_derive) {
 	TEST_REG(test_func_derive, exponent_simple);
 	TEST_REG(test_func_derive, exponent_simple2);
@@ -201,6 +229,8 @@ TEST_RUNNER(test_func_derive) {
 	TEST_REG(test_func_derive, var);
 	TEST_REG(test_func_derive, constant);
 	TEST_REG(test_func_derive, log);
+	TEST_REG(test_func_derive, sqrt);
 	TEST_REG(test_func_derive, e_raise_x);
 	TEST_REG(test_func_derive, chain_simple);
+	TEST_REG(test_func_derive, chain_chain_simple);
 }
