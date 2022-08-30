@@ -12,6 +12,7 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 typedef enum {
 	PREPROCESSOR_ERROR_OK,
 	PREPROCESSOR_ERROR_INSUFFICIENT_SPACE,
+	PREPROCESSOR_ERROR_UNMATCHED_PARENTHESES,
 } preprocessor_error_t;
 
 preprocessor_error_t preprocessor_errno();

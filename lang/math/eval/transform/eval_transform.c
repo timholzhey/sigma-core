@@ -40,16 +40,24 @@ retval_t eval_transform_function_node(ast_node_t *ast, pattern_registry_t *regis
 		}
 	}
 
-
 	if (applied && propagate && allow_propagation) {
-		if (ast->left) {
-			if (eval_transform_function_node(ast->left, registry, false) != RETVAL_OK) {
+		pattern_t *applied_pattern = pattern_get_applied();
+		if (applied_pattern == NULL || applied_pattern->do_propagate == false) {
+			log_error("Pattern error during propagation");
+			return RETVAL_ERROR;
+		}
+
+		ast_node_t *nodes[MAX_NUM_PROPAGATION_INDICES];
+		for (uint8_t i = 0; i < applied_pattern->num_propagation_indices; i++) {
+			nodes[i] = ast_get_node_by_index(ast, applied_pattern->propagation_indices[i]);
+			if (nodes[i] == NULL) {
+				log_error("No node found for index %d", applied_pattern->propagation_indices[i]);
 				return RETVAL_ERROR;
 			}
 		}
 
-		if (ast->right) {
-			if (eval_transform_function_node(ast->right, registry, false) != RETVAL_OK) {
+		for (uint8_t i = 0; i < applied_pattern->num_propagation_indices; i++) {
+			if (eval_transform_function_node(nodes[i], registry, applied_pattern->propagation_indices[i] > 1) != RETVAL_OK) { // TODO: this is wrong, just prevent infinite recursion
 				return RETVAL_ERROR;
 			}
 		}

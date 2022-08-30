@@ -29,6 +29,25 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 	memcpy(tokens_out, tokens_in, num_tokens_in * sizeof(token_t));
 	*num_tokens_out = num_tokens_in;
 
+	// Check for unmatched parentheses
+	token_type_t paren_stack[100];
+	int paren_stack_size = 0;
+	for (int i = 0; i < num_tokens_in; i++) {
+		if (tokens_out[i].type == TOKEN_TYPE_PAREN_OPEN) {
+			paren_stack[paren_stack_size++] = TOKEN_TYPE_PAREN_OPEN;
+		} else if (tokens_out[i].type == TOKEN_TYPE_PAREN_CLOSE) {
+			if (paren_stack_size == 0) {
+				error = PREPROCESSOR_ERROR_UNMATCHED_PARENTHESES;
+				PREPROCESSOR_FAIL_WITH_MSG("Unmatched parentheses");
+			}
+			paren_stack_size--;
+		}
+	}
+	if (paren_stack_size > 0) {
+		error = PREPROCESSOR_ERROR_UNMATCHED_PARENTHESES;
+		PREPROCESSOR_FAIL_WITH_MSG("Unmatched parentheses");
+	}
+
 	// Expand unary operators: leading plus or minus
 	bool begin_scope = true;
 	for (int i = 0; i < *num_tokens_out; i++) {
@@ -89,7 +108,9 @@ retval_t lang_preprocess(token_t *tokens_in, int num_tokens_in, token_t *tokens_
 	for (int i = 1; i < *num_tokens_out; i++) {
 		// Find matching pair
 		if (token_flags_map[tokens_out[i].type] & TOKEN_FLAG_IMPL_MUL_BEFORE &&
-			token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_IMPL_MUL_AFTER) {
+			token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_IMPL_MUL_AFTER &&
+			!(token_flags_map[tokens_out[i].type] & TOKEN_FLAG_SURROUND &&
+			  (token_flags_map[tokens_out[i - 1].type] & TOKEN_FLAG_SURROUND) == 0)) {
 			if (*num_tokens_out + 1 > max_num_tokens_out) {
 				error = PREPROCESSOR_ERROR_INSUFFICIENT_SPACE;
 				PREPROCESSOR_FAIL_WITH_MSG("Not enough space in token output");

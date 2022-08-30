@@ -9,9 +9,11 @@
 #include "logging.h"
 #include <stddef.h>
 #include <string.h>
-#include <eval_const.h>
-#include <pattern_compile.h>
-#include <pattern_generate.h>
+#include "eval_const.h"
+#include "pattern_compile.h"
+#include "pattern_generate.h"
+
+static pattern_t *applied_pattern;
 
 retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 	if (ast == NULL || pattern == NULL) {
@@ -58,12 +60,17 @@ retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registr
 			return RETVAL_ERROR;
 		}
 		if (*applied) {
+			applied_pattern = &registry->patterns[i];
 			*propagate |= registry->patterns[i].do_propagate;
 			return RETVAL_OK;
 		}
 	}
 
 	return RETVAL_OK;
+}
+
+pattern_t *pattern_get_applied() {
+	return applied_pattern;
 }
 
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule) {

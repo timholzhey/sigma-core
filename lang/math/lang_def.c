@@ -2,6 +2,7 @@
 // Created by Tim Holzhey on 16.08.22.
 //
 
+#include <stddef.h>
 #include "lang_def.h"
 
 const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
@@ -131,3 +132,26 @@ const uint8_t token_precedence_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_NUM] = TOKEN_PRECEDENCE_NONE,
 		[TOKEN_TYPE_CONST_E] = TOKEN_PRECEDENCE_NONE,
 };
+
+static ast_node_t *find_node_by_index(ast_node_t *root, uint32_t find_idx, uint32_t cur_idx) {
+	if (find_idx == cur_idx) {
+		return root;
+	}
+	if (find_idx >= 2 * cur_idx + 1 && root->left) {
+		ast_node_t *node = find_node_by_index(root->left, find_idx, 2 * cur_idx + 1);
+		if (node) {
+			return node;
+		}
+	}
+	if (find_idx >= 2 * cur_idx + 2 && root->right) {
+		ast_node_t *node = find_node_by_index(root->right, find_idx, 2 * cur_idx + 2);
+		if (node) {
+			return node;
+		}
+	}
+	return NULL;
+}
+
+ast_node_t *ast_get_node_by_index(ast_node_t *root, uint32_t index) {
+	return find_node_by_index(root, index, 0);
+}

@@ -108,6 +108,22 @@ TEST_DEF(test_preprocessor, fail_insufficient_space) {
 	TEST_CLEAN_UP_AND_RETURN(0);
 }
 
+TEST_DEF(test_preprocessor, fail_unmatched_parentheses) {
+	int num_tokens_in = 1;
+	token_t tokens_in[num_tokens_in];
+	tokens_in[0].type = TOKEN_TYPE_PAREN_OPEN;
+	int num_tokens_out = 0;
+	token_t tokens_out[1000];
+
+	retval_t ret = lang_preprocess(tokens_in, num_tokens_in, tokens_out, &num_tokens_out, 2);
+	preprocessor_error_t err = preprocessor_errno();
+
+	TEST_ASSERT_EQ(ret, RETVAL_ERROR);
+	TEST_ASSERT_EQ(err, PREPROCESSOR_ERROR_UNMATCHED_PARENTHESES);
+
+	TEST_CLEAN_UP_AND_RETURN(0);
+}
+
 TEST_DEF(test_preprocessor, truncate_consecutive_negative_signs) {
 	int num_tokens_in = 10;
 	token_t tokens_in[num_tokens_in];
@@ -173,6 +189,7 @@ TEST_RUNNER(test_preprocessor) {
 	TEST_REG(test_preprocessor, precedence_parentheses);
 	TEST_REG(test_preprocessor, expand_unary_simple);
 	TEST_REG(test_preprocessor, fail_insufficient_space);
+	TEST_REG(test_preprocessor, fail_unmatched_parentheses);
 	TEST_REG(test_preprocessor, truncate_consecutive_negative_signs);
 	TEST_REG(test_preprocessor, implicit_multiplication);
 }

@@ -13,6 +13,7 @@
 #define MAX_NUM_REPLACE_NODES		100
 #define MAX_NUM_PATTERNS_REGISTRY	100
 #define MAX_PATTERN_NAME_LEN		50
+#define MAX_NUM_PROPAGATION_INDICES	10
 
 typedef enum {
 	PATTERN_NODE_TYPE_MATCH_TOKEN,
@@ -39,8 +40,10 @@ typedef struct pattern_node_t pattern_node_t;
 typedef struct {
 	pattern_node_t match[MAX_NUM_MATCH_NODES];
 	pattern_node_t replace[MAX_NUM_REPLACE_NODES];
-	int num_match_nodes;
-	int num_replace_nodes;
+	uint8_t num_match_nodes;
+	uint8_t num_replace_nodes;
+	uint8_t num_propagation_indices;
+	uint8_t propagation_indices[MAX_NUM_PROPAGATION_INDICES];
 	char name[MAX_PATTERN_NAME_LEN];
 	uint8_t do_propagate:1;
 } pattern_t;
@@ -54,6 +57,8 @@ typedef struct {
 retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied);
 
 retval_t pattern_registry_apply_all(ast_node_t *ast, pattern_registry_t *registry, bool *applied, bool *propagate);
+
+pattern_t *pattern_get_applied();
 
 retval_t pattern_registry_add_rule(pattern_registry_t *registry, const char *name, const char *rule);
 

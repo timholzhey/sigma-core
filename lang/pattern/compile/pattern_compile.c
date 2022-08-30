@@ -19,14 +19,15 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	memset(pattern, 0, sizeof(pattern_t));
 	char tok_buf[50];
 	int tok_buf_pos = 0;
-	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false, was_access_capture = false, do_error = false, do_invert = false;
+	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false,
+		was_access_capture = false, do_error = false, do_invert = false;
 	pattern_node_t *pattern_nodes = pattern->match;
 	pattern_node_t replacement_nodes[100];
-	int *pattern_node_pos = &pattern->num_match_nodes;
-	int replacement_node_pos = 0;
-	int capture_index = 0;
+	uint8_t *pattern_node_pos = &pattern->num_match_nodes;
+	uint8_t replacement_node_pos = 0;
+	uint8_t capture_index = 0;
 	pattern_node_t *store_node;
-	int *store_node_pos;
+	uint8_t *store_node_pos;
 	allow_permutation = true;
 
 	for (int i = 0; i < rule_len; i++) {
@@ -38,6 +39,8 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 
 		if (rule[i] == '@') {
 			pattern->do_propagate = 1;
+			tok_buf_pos = 0;
+			continue;
 		}
 
 		if (rule[i] == '(' && !do_capture && !do_eval) {
@@ -64,6 +67,12 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			continue;
 		}
 
+		if (rule[i] == '*') {
+			pattern->propagation_indices[pattern->num_propagation_indices++] = *pattern_node_pos;
+			tok_buf_pos = 0;
+			continue;
+		}
+
 		store_node = &pattern_nodes[*pattern_node_pos];
 		store_node_pos = pattern_node_pos;
 
@@ -85,6 +94,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				tok_buf_pos = 0;
 				continue;
 			}
+
 			if (rule[i] == ']') {
 				if (do_match_number) {
 					do_match_number = false;
