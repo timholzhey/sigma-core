@@ -11,7 +11,7 @@
 
 static struct {
 	parser_error_t error;
-	ast_node_t *fill;
+	ast_node_t fill;
 } m_parser;
 
 #define MAX_NESTING_LEVEL		1000
@@ -58,9 +58,31 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 
 		// Case 1: Current token is unset
 		if (current->token.type == TOKEN_TYPE_NONE) {
+			// Check begin scope was inferred by prefix
+			if (begin_scope_prefixed) {
+				begin_scope_prefixed = false;
+				if (token_flags_map[token.type] & TOKEN_FLAG_BEGIN_SCOPE) {
+					continue;
+				}
+				current = nesting_stack[--nesting_level];
+				memcpy(&current->left->token, &token, sizeof(token_t));
+				continue;
+			}
+
 			// Check begin scope
 			if (token_flags_map[token.type] & TOKEN_FLAG_BEGIN_SCOPE) {
 				nesting_stack[nesting_level++] = current;
+				continue;
+			}
+
+			// Check prefix
+			if (token_flags_map[token.type] & TOKEN_FLAG_PREFIX) {
+				current->right = &m_parser.fill;
+				nesting_stack[nesting_level++] = current;
+				PARSER_HANDLE_MALLOC(current->left = calloc(1, sizeof(ast_node_t)));
+				memcpy(&current->token, &token, sizeof(token_t));
+				current = current->left;
+				begin_scope_prefixed = true;
 				continue;
 			}
 
@@ -82,6 +104,12 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 				continue;
 			}
 
+			// Check end scope
+			if (token_flags_map[token.type] & TOKEN_FLAG_END_SCOPE) {
+				current = nesting_stack[--nesting_level];
+				continue;
+			}
+
 			PARSER_HANDLE_MALLOC(current->left = calloc(1, sizeof(ast_node_t)));
 			memcpy(&current->left->token, &token, sizeof(token_t));
 
@@ -97,7 +125,7 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 			// Check finished
 			if (token_flags_map[token.type] & TOKEN_FLAG_PREFIX ||
 				token_flags_map[token.type] & TOKEN_FLAG_POSTFIX) {
-				current->right = m_parser.fill;
+				current->right = &m_parser.fill;
 				continue;
 			}
 
@@ -113,7 +141,7 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 					PARSER_FAIL_WITH_MSG("Surrounding tokens do not match: %s and %s",
 						token_type_name_map[current->token.type], token_type_name_map[token.type]);
 				}
-				current->right = m_parser.fill;
+				current->right = &m_parser.fill;
 				continue;
 			}
 
@@ -150,6 +178,8 @@ retval_t lang_parse(token_t *tokens, int num_tokens, ast_node_t *ast) {
 			current = nesting_stack[--nesting_level];
 			continue;
 		}
+
+		// Unexpected token
 		if ((token_flags_map[token.type] & TOKEN_FLAG_INFIX) == 0 &&
 			(token_flags_map[token.type] & TOKEN_FLAG_POSTFIX) == 0) {
 			m_parser.error = PARSER_ERROR_UNEXPECTED_TOKEN;
