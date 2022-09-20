@@ -3,8 +3,8 @@
 //
 
 #include "testlib.h"
-#include "lexer.h"
-#include "preprocess.h"
+#include "math_lexer.h"
+#include "math_preprocess.h"
 
 TEST_DEF(test_preprocessor, precedence_simple) {
 	int num_tokens_in = 7;

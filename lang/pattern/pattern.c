@@ -9,7 +9,7 @@
 #include "logging.h"
 #include <stddef.h>
 #include <string.h>
-#include "eval_const.h"
+#include "math_eval_const.h"
 #include "pattern_compile.h"
 #include "pattern_generate.h"
 

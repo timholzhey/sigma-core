@@ -5,7 +5,7 @@
 #ifndef SIGMA_CORE_PATTERN_MATCH_H
 #define SIGMA_CORE_PATTERN_MATCH_H
 
-#include "lang_def.h"
+#include "math_lang_def.h"
 #include "pattern.h"
 #include <stdbool.h>
 

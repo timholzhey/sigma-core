@@ -5,7 +5,7 @@
 #ifndef SIGMA_CORE_PATTERN_COMPILE_H
 #define SIGMA_CORE_PATTERN_COMPILE_H
 
-#include "lang_def.h"
+#include "math_lang_def.h"
 #include <stddef.h>
 #include "pattern.h"
 

@@ -5,7 +5,7 @@
 #ifndef SIGMA_CORE_POSTPROCESS_H
 #define SIGMA_CORE_POSTPROCESS_H
 
-#include "lang_def.h"
+#include "math_lang_def.h"
 
 retval_t lang_postprocess(ast_node_t *ast_in, ast_node_t *ast_out);
 

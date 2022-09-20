@@ -4,9 +4,9 @@
 
 #include <string.h>
 #include "testlib.h"
-#include "stringify.h"
-#include "parser.h"
-#include "lexer.h"
+#include "math_stringify.h"
+#include "math_parser.h"
+#include "math_lexer.h"
 
 TEST_DEF(test_stringify, simple_prefix) {
 	int num_tokens = 2;

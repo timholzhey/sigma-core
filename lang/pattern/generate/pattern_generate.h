@@ -5,7 +5,7 @@
 #ifndef SIGMA_CORE_PATTERN_GENERATE_H
 #define SIGMA_CORE_PATTERN_GENERATE_H
 
-#include "lang_def.h"
+#include "math_lang_def.h"
 #include "pattern.h"
 
 #define MAX_NUM_PATTERN_PERMUTATIONS	100

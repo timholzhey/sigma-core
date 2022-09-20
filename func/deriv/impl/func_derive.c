@@ -7,7 +7,7 @@
 #include "func_derive.h"
 #include "derive_transform.h"
 #include "logging.h"
-#include "eval_transform.h"
+#include "math_eval_transform.h"
 
 retval_t func_derive(ast_node_t *ast_in, ast_node_t *ast_out) {
 	memcpy(ast_out, ast_in, sizeof(ast_node_t));

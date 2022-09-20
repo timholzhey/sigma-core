@@ -3,11 +3,11 @@
 //
 
 #include <string.h>
-#include "eval_const.h"
+#include "math_eval_const.h"
 #include "func_const.h"
 #include "const_transform.h"
 #include "logging.h"
-#include "eval_transform.h"
+#include "math_eval_transform.h"
 
 retval_t func_const(ast_node_t *ast_in, ast_node_t *ast_out) {
 	memcpy(ast_out, ast_in, sizeof(ast_node_t));

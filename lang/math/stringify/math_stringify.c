@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "stringify.h"
+#include "math_stringify.h"
 #include "logging.h"
-#include "lexer.h"
+#include "math_lexer.h"
 
 #define STRINGIFIER_FAIL_WITH_MSG(...) { \
 	log_error_noterm("Preprocessor failed with error: "); \

@@ -3,7 +3,7 @@
 //
 
 #include "testlib.h"
-#include "lexer.h"
+#include "math_lexer.h"
 
 TEST_DEF(test_lexer, simple) {
 	const char *input = "1.5*x^2-3!";

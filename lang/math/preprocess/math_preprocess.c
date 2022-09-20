@@ -5,7 +5,7 @@
 #include <printf.h>
 #include <string.h>
 #include <stdbool.h>
-#include "preprocess.h"
+#include "math_preprocess.h"
 #include "logging.h"
 
 static token_t tokens_temp[1000];

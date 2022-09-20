@@ -3,8 +3,8 @@
 //
 
 #include "testlib.h"
-#include "parser.h"
-#include "lexer.h"
+#include "math_parser.h"
+#include "math_lexer.h"
 
 TEST_DEF(test_parser, fail_tokens_null) {
 	retval_t ret = lang_parse(NULL, 10, NULL);

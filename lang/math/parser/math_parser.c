@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "parser.h"
+#include "math_parser.h"
 #include "logging.h"
 
 static struct {

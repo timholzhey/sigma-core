@@ -3,7 +3,7 @@
 //
 
 #include "logging.h"
-#include "eval_transform.h"
+#include "math_eval_transform.h"
 
 retval_t eval_transform_node(ast_node_t *ast, pattern_registry_t *registry) {
 	bool applied = false, propagate = false;

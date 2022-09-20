@@ -3,7 +3,7 @@
 //
 
 #include <stddef.h>
-#include "lang_def.h"
+#include "math_lang_def.h"
 
 const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_NONE] = "",

@@ -5,7 +5,7 @@
 #ifndef SIGMA_CORE_FUNC_DERIVE_H
 #define SIGMA_CORE_FUNC_DERIVE_H
 
-#include "lang_def.h"
+#include "math_lang_def.h"
 
 void func_derive_init();
 
