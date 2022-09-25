@@ -2,7 +2,6 @@
 // Created by Tim Holzhey on 23.08.22.
 //
 
-#include <printf.h>
 #include <string.h>
 #include <stdbool.h>
 #include "preprocess.h"

@@ -3,8 +3,13 @@
 #include "sigma.h"
 #include "io.h"
 
-int main() {
+int main(int argc, char *argv[]) {
 	sigma_init();
+
+	if (argc > 1) {
+		printf("%s", derive(argv[1], 'x'));
+		return 0;
+	}
 
 	char buff[255];
 

@@ -35,6 +35,6 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_func_derive.c
 )
 
-target_compile_definitions(run_tests PRIVATE DEBUG_GLOBAL=12)
+target_compile_definitions(run_tests PRIVATE DEBUG_GLOBAL=1)
 
 target_link_libraries(run_tests m)

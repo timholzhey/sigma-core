@@ -3,7 +3,6 @@
 //
 
 #include <string.h>
-#include <printf.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "lexer.h"
