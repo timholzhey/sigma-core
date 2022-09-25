@@ -1,37 +1,49 @@
 #include <stdio.h>
 #include <string.h>
+#include "logging.h"
 #include "math_core.h"
 #include "io.h"
 #include "sigma_compile.h"
 
+#define INPUT_BUFFER_SIZE		1024
+#define OUTPUT_BUFFER_SIZE		1024
+
 int main(int argc, char **argv) {
 	math_core_init();
 
+	char in_buf[INPUT_BUFFER_SIZE];
+	char out_buf[OUTPUT_BUFFER_SIZE];
+
 	if (argc > 1) {
-		printf("%s", derive(argv[1], 'x'));
+		sigma_compile(argv[1], out_buf, OUTPUT_BUFFER_SIZE);
+		printf("%s\n", out_buf);
 		return 0;
 	}
 
-	char buff[255];
-
-	if (argc > 1) {
-		char output[256];
-		sigma_compile(argv[1], output, 256);
-		printf("%s\n", output);
-		return 0;
-	}
+	printf("Sigma algebra engine v0.0.1.\n"
+		   "Type \"help\" for more information and \"q\" to quit.\n");
 
 	while (1) {
-		int ret = cli_get_line("Input function to derive in respect to x\nf(x) = ", buff, sizeof(buff));
+		int ret = cli_get_line("> ", in_buf, INPUT_BUFFER_SIZE);
 		if (ret != 0) {
 			return 1;
 		}
 
-		if (strcmp(buff, "exit") == 0 || strcmp(buff, "q") == 0) {
+		if (strcmp(in_buf, "q") == 0) {
 			break;
 		}
 
-		printf("f'(x) = %s\n\n", derive(buff, 'x'));
+		if (strcmp(in_buf, "help") == 0) {
+			log_info("%-25sShow this message", "help");
+			log_info("%-25sQuit the program", "q");
+			log_info("%-25sDerive a function", "derive[<function>]");
+			log_info("%-25sEvaluate a constant expression\n", "const[<function>]");
+			continue;
+		}
+
+		if (sigma_compile(in_buf, out_buf, OUTPUT_BUFFER_SIZE) == RETVAL_OK) {
+			log_output("%s", out_buf);
+		}
 	}
 
 	return 0;

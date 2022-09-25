@@ -3,24 +3,21 @@
 //
 
 #include <string.h>
-#include <printf.h>
 #include <stdbool.h>
 #include "sigma_compile.h"
 #include "math_core.h"
 #include "sigma_lang_def.h"
 #include "logging.h"
 
-typedef enum {
-	SIGMA_CONTEXT_ANY,
-	SIGMA_CONTEXT_SIGMA,
-	SIGMA_CONTEXT_MATH,
-} sigma_context_t;
+#define SIGMA_ERROR_AT(x) \
+	log_info(input);        \
+	log_info_noterm("%*s", x - 1, ""); \
+	log_info_noterm("^\n");     \
 
 retval_t sigma_compile(const char *input, char *output, int output_length) {
 	int buf_pos = 0;
 	char buf[256];
 	int input_pos = 0;
-	sigma_context_t context = SIGMA_CONTEXT_SIGMA;
 	math_function_t math_function_stack[256];
 	int math_function_stack_size = 0;
 	int paren_stack_size = 0;
@@ -32,12 +29,12 @@ retval_t sigma_compile(const char *input, char *output, int output_length) {
 	while (input[input_pos] != '\0') {
 		buf[buf_pos++] = input[input_pos++];
 
-		if (buf[buf_pos - 1] == '(') {
-			paren_stack[paren_stack_size++] = '(';
-		} else if (buf[buf_pos - 1] == ')') {
+		if (buf[buf_pos - 1] == '[') {
+			paren_stack[paren_stack_size++] = '[';
+		} else if (buf[buf_pos - 1] == ']') {
 			if (output_pos == 0) {
 				if (buf_pos > output_length) {
-					log_error("Output buffer too small");
+					log_error("InternalError: Output buffer too small");
 					return RETVAL_ERROR;
 				}
 				memcpy(output, buf, buf_pos - 1);
@@ -50,8 +47,9 @@ retval_t sigma_compile(const char *input, char *output, int output_length) {
 
 		if (do_begin_scope) {
 			do_begin_scope = false;
-			if (buf[0] != '(') {
-				log_error("Expected '(' when switching to new context");
+			if (buf[0] != '[') {
+				SIGMA_ERROR_AT(input_pos);
+				log_error("SigmaError: Expected '[' when beginning a scope");
 				return RETVAL_ERROR;
 			}
 			buf_pos = 0;
@@ -63,7 +61,6 @@ retval_t sigma_compile(const char *input, char *output, int output_length) {
 				if (math_function_str_repr_map[i][buf_pos] == '\0') {
 					buf_pos = 0;
 					do_begin_scope = true;
-					context = SIGMA_CONTEXT_ANY;
 					math_function_stack[math_function_stack_size++] = i;
 					break;
 				}
@@ -73,18 +70,22 @@ retval_t sigma_compile(const char *input, char *output, int output_length) {
 		if (do_end_scope) {
 			do_end_scope = false;
 			buf_pos = 0;
-			context = SIGMA_CONTEXT_SIGMA;
 			math_function_stack_size--;
 			const char *result = math_function(output, 'x', math_function_stack[math_function_stack_size]);
 			int result_len = strlen(result);
 			if (result_len > output_length) {
-				log_error("Output buffer too small");
+				log_error("InternalError: Output buffer too small");
 				return RETVAL_ERROR;
 			}
 			memcpy(output, result, result_len);
 			output[result_len] = '\0';
 			continue;
 		}
+	}
+
+	if (buf_pos != 0) {
+		log_error("SigmaError: %s is not a valid expression.", buf);
+		return RETVAL_ERROR;
 	}
 
 	return RETVAL_OK;
