@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "lexer.h"
+#include "math_lexer.h"
 #include "logging.h"
 
 static struct {
@@ -185,7 +185,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 				continue;
 			} else {
 				m_lexer.error = LEXER_ERROR_UNKNOWN_TOKEN;
-				LEXER_FAIL_WITH_MSG("Unknown token '%c'", input[input_pos]);
+				LEXER_FAIL_WITH_MSG("Unknown token '%c' at %d", input[input_pos], input_pos);
 			}
 		}
 	}

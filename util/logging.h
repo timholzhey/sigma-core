@@ -22,7 +22,7 @@
 	printf("%s", LOG_COLOR_RESET); \
 }
 
-#ifdef DEBUG_GLOBAL
+#if defined(DEBUG_GLOBAL) && DEBUG_GLOBAL == 1
 #define log_debug(...)				log_internal(LOG_COLOR_RESET, __VA_ARGS__);
 #else
 #define log_debug(...)

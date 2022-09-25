@@ -2,8 +2,8 @@
 // Created by Tim Holzhey on 16.08.22.
 //
 
-#ifndef SIGMA_CORE_LANG_DEF_H
-#define SIGMA_CORE_LANG_DEF_H
+#ifndef SIGMA_CORE_MATH_LANG_DEF_H
+#define SIGMA_CORE_MATH_LANG_DEF_H
 
 #include <stdint.h>
 
@@ -94,4 +94,4 @@ typedef struct ast_node_t ast_node_t;
 
 ast_node_t *ast_get_node_by_index(ast_node_t *root, uint32_t index);
 
-#endif //SIGMA_CORE_LANG_DEF_H
+#endif //SIGMA_CORE_MATH_LANG_DEF_H

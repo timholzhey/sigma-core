@@ -3,9 +3,9 @@
 //
 
 #include "testlib.h"
-#include "lang_def.h"
+#include "math_lang_def.h"
 #include "pattern_compile.h"
-#include "parser.h"
+#include "math_parser.h"
 #include "pattern_match.h"
 #include "pattern_replace.h"
 #include <string.h>

@@ -3,7 +3,7 @@
 //
 
 #include <string.h>
-#include "postprocess.h"
+#include "math_postprocess.h"
 #include "logging.h"
 
 retval_t lang_postprocess(ast_node_t *ast_in, ast_node_t *ast_out) {

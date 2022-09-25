@@ -4,21 +4,21 @@
 
 #include <stdbool.h>
 #include "func_derive.h"
-#include "sigma.h"
-#include "lang_def.h"
-#include "lexer.h"
-#include "parser.h"
+#include "math_core.h"
+#include "math_lang_def.h"
+#include "math_lexer.h"
+#include "math_parser.h"
 #include "logging.h"
-#include "preprocess.h"
-#include "evaluator.h"
-#include "stringify.h"
+#include "math_preprocess.h"
+#include "math_evaluator.h"
+#include "math_stringify.h"
 #include "func_const.h"
 
 #define MAX_NUM_TOKENS 1000
 
 static bool module_initialized = false;
 
-void sigma_init() {
+void math_core_init() {
 	if (module_initialized) {
 		return;
 	}
@@ -32,13 +32,13 @@ const char *retval_string[RETVAL_COUNT] = {
 		[RETVAL_ERROR] = "Error",
 };
 
-const char *sigma_function(const char *func_str, char var, sigma_function_t sigma_func) {
+const char *math_function(const char *func_str, char var, math_function_t sigma_func) {
 	if (!module_initialized) {
 		log_error("Sigma: Module is not initialized");
 		return "ERR";
 	}
 
-	if (sigma_func >= SIGMA_FUNCTION_COUNT) {
+	if (sigma_func >= MATH_FUNCTION_COUNT) {
 		log_error("Unknown sigma function %u", sigma_func);
 		return "ERR";
 	}
@@ -93,5 +93,5 @@ const char *sigma_function(const char *func_str, char var, sigma_function_t sigm
 }
 
 const char *derive(const char *func, char var) {
-	return sigma_function(func, var, SIGMA_FUNCTION_DERIVE);
+	return math_function(func, var, MATH_FUNCTION_DERIVE);
 }

@@ -6,7 +6,7 @@
 #define SIGMA_CORE_PATTERN_H
 
 #include <stdbool.h>
-#include "lang_def.h"
+#include "math_lang_def.h"
 
 #define MAX_NUM_CAPTURE_GROUPS		9
 #define MAX_NUM_MATCH_NODES			100

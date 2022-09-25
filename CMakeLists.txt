@@ -12,7 +12,7 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/impl
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/inf
+        ${CMAKE_CURRENT_SOURCE_DIR}/core
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lang
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/math
@@ -32,6 +32,9 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/replace
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/generate
 
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma/compile
+
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
 
         ${CMAKE_CURRENT_SOURCE_DIR}/util
@@ -41,17 +44,17 @@ add_executable(
         sigma_core
         ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/inf/sigma.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/math_core.c
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/lexer/lexer.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/parser/parser.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/lang_def.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/evaluator.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/const/eval_const.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/transform/eval_transform.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/preprocess/preprocess.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/postprocess/postprocess.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/stringify/stringify.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/lexer/math_lexer.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/parser/math_parser.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/math_lang_def.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/math_evaluator.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/const/math_eval_const.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/eval/transform/math_eval_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/preprocess/math_preprocess.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/postprocess/math_postprocess.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/stringify/math_stringify.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/pattern.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/compile/pattern_compile.c
@@ -59,6 +62,9 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/replace/pattern_replace.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/capture/pattern_capture.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/generate/pattern_generate.c
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma/sigma_lang_def.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma/compile/sigma_compile.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl/func_derive.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c
@@ -69,5 +75,7 @@ add_executable(
 )
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)
+
+target_compile_definitions(sigma_core PRIVATE DEBUG_GLOBAL=0)
 
 target_link_libraries(sigma_core m)
