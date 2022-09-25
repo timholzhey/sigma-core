@@ -78,4 +78,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt)
 
 target_compile_definitions(sigma_core PRIVATE DEBUG_GLOBAL=0)
 
+set(CMAKE_VERBOSE_MAKEFILE on)
+
 target_link_libraries(sigma_core m)
