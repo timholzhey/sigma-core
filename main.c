@@ -34,10 +34,10 @@ int main(int argc, char **argv) {
 		}
 
 		if (strcmp(in_buf, "help") == 0) {
-			log_info("%-25sShow this message", "help");
-			log_info("%-25sQuit the program", "q");
-			log_info("%-25sDerive a function", "derive[<function>]");
-			log_info("%-25sEvaluate a constant expression\n", "const[<function>]");
+			log_info("%-35sShow this message", "help");
+			log_info("%-35sQuit the program", "q");
+			log_info("%-35sDerive a function (short: '<function>)", "derive[<function>(,<variable>)]");
+			log_info("%-35sEvaluate a constant expression (short: <function>)\n", "const[<function>]");
 			continue;
 		}
 
