@@ -81,3 +81,8 @@ target_compile_definitions(sigma_core PRIVATE DEBUG_GLOBAL=0)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 target_link_libraries(sigma_core m)
+
+# After build, move the executable to /usr/local/bin and rename to "sigma"
+add_custom_command(TARGET sigma_core POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:sigma_core> ~/bin/sigma
+        COMMENT "Moving executable to /usr/local/bin/sigma")
