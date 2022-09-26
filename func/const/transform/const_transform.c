@@ -15,7 +15,7 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "POWER_0", "~POW,ANY,(NUM=0) > [NUM=1]");
 	pattern_registry_add_rule(&const_registry, "1_POWER", "~POW,(NUM=1),ANY > [NUM=1]");
 	pattern_registry_add_rule(&const_registry, "ADD_0", "ADD,(ANY),(NUM=0) > $1");
-	pattern_registry_add_rule(&const_registry, "SUB_0", "SUB,(ANY),(NUM=0) > $1");
+	pattern_registry_add_rule(&const_registry, "SUB_0", "~SUB,(ANY),(NUM=0) > $1");
 	pattern_registry_add_rule(&const_registry, "MUL_0", "MUL,(ANY),(NUM=0) > [NUM=0]");
 	pattern_registry_add_rule(&const_registry, "MUL_1", "MUL,(ANY),(NUM=1) > $1");
 	pattern_registry_add_rule(&const_registry, "DIV_BY_1", "~DIV,(ANY),(NUM=1) > $1");
