@@ -27,6 +27,7 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "VAR_DIV", "DIV,VAR,VAR > [NUM=1]");
 	pattern_registry_add_rule(&const_registry, "VAR_MUL_POWERS", "MUL,POW,POW,VAR,(NUM),VAR,(NUM) > POW,VAR,[ADD,$1,$2]");
 	pattern_registry_add_rule(&const_registry, "ADD_NEGATIVE", "ADD,(ANY),SUB,-,-,(NUM=0),(ANY) > SUB,$1,$3");
+	pattern_registry_add_rule(&const_registry, "~SUB_NEG", "SUB,(ANY),SUB,-,-,(NUM=0),(ANY) > ADD,$1,$3");
 
 	pattern_registry_add_rule(&const_registry, "BINOM_1", "~POW,ADD,(NUM=2),(ANY),(ANY) > "
 														  "ADD,"
