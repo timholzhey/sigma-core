@@ -6,31 +6,29 @@ Algebra engine in C (WIP)
 - [x] Derive
 - [ ] Integrate
 
-## Example
+## REPL example
+
+```shell
+~ % sigma
+Sigma algebra engine v0.0.1.
+Type "help" for more information and "q" to quit.
+> 10^3
+1000
+> 'x^2
+2x
+> derive[sin(y),y]
+cos(y)
+> 
+```
+
+## Library Example
 
 ```c
 #include <stdio.h>
-#include "sigma.h"
+#include "math_core.h"
 
 int main() {
     printf("The derivative of x^2+sin(2x) is %s", derive("x^2+sin(2x)", 'x'));
     return 0;
 }
 ```
-
-## Derivative solver flow
-- Lex string
-- Preprocess tokens
-- Parse tokens
-- Eval AST
-  - Const eval
-    - Transform constant rules
-    - Evaluate constant operations
-    - Transform constant rules
-  - Transform derivative rules set 1
-  - Transform derivative rules set 2
-  - Const eval
-    - Transform constant rules
-    - Evaluate constant operations
-    - Transform constant rules
-- Stringify
