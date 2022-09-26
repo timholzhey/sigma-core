@@ -33,9 +33,15 @@ int main(int argc, char **argv) {
 			break;
 		}
 
+		if (strcmp(in_buf, "repo") == 0) {
+			log_info("https://github.com/timholzhey/sigma-core");
+			continue;
+		}
+
 		if (strcmp(in_buf, "help") == 0) {
 			log_info("%-35sShow this message", "help");
 			log_info("%-35sQuit the program", "q");
+			log_info("%-35sShow git repository", "repo");
 			log_info("%-35sDerive a function (short: '<function>)", "derive[<function>(,<variable>)]");
 			log_info("%-35sEvaluate a constant expression (short: <function>)\n", "const[<function>]");
 			continue;
