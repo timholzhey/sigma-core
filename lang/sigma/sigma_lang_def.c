@@ -8,3 +8,8 @@ const char *math_function_str_repr_map[MATH_FUNCTION_COUNT] = {
 		[MATH_FUNCTION_DERIVE] = "derive",
 		[MATH_FUNCTION_CONST] = "const",
 };
+
+const char *math_function_shorthand_str_repr_map[MATH_FUNCTION_COUNT] = {
+		[MATH_FUNCTION_DERIVE] = "'",
+		[MATH_FUNCTION_CONST] = "=",
+};
