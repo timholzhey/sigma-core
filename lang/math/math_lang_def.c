@@ -35,6 +35,7 @@ const char *token_str_repr_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_VAR] = "",
 		[TOKEN_TYPE_NUM] = "",
 		[TOKEN_TYPE_CONST_E] = "e",
+		[TOKEN_TYPE_CONST_PI] = "pi",
 };
 
 const char *token_type_name_map[TOKEN_TYPE_COUNT] = {
@@ -67,6 +68,7 @@ const char *token_type_name_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_VAR] = "VAR",
 		[TOKEN_TYPE_NUM] = "NUM",
 		[TOKEN_TYPE_CONST_E] = "E",
+		[TOKEN_TYPE_CONST_PI] = "PI",
 };
 
 const uint32_t token_flags_map[TOKEN_TYPE_COUNT] = {
@@ -99,6 +101,7 @@ const uint32_t token_flags_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_VAR] = TOKEN_FLAG_IMPL_MUL_BEFORE | TOKEN_FLAG_IMPL_MUL_AFTER,
 		[TOKEN_TYPE_NUM] = TOKEN_FLAG_IMPL_MUL_AFTER,
 		[TOKEN_TYPE_CONST_E] = TOKEN_FLAG_NONE,
+		[TOKEN_TYPE_CONST_PI] = TOKEN_FLAG_NONE,
 };
 
 const uint8_t token_precedence_map[TOKEN_TYPE_COUNT] = {
@@ -131,6 +134,7 @@ const uint8_t token_precedence_map[TOKEN_TYPE_COUNT] = {
 		[TOKEN_TYPE_VAR] = TOKEN_PRECEDENCE_NONE,
 		[TOKEN_TYPE_NUM] = TOKEN_PRECEDENCE_NONE,
 		[TOKEN_TYPE_CONST_E] = TOKEN_PRECEDENCE_NONE,
+		[TOKEN_TYPE_CONST_PI] = TOKEN_PRECEDENCE_NONE,
 };
 
 static ast_node_t *find_node_by_index(ast_node_t *root, uint32_t find_idx, uint32_t cur_idx) {
