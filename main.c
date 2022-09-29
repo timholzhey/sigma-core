@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "logging.h"
 #include "math_core.h"
 #include "io.h"
 #include "sigma_compile.h"
 
 #define INPUT_BUFFER_SIZE		1024
-#define OUTPUT_BUFFER_SIZE		1024
+#define OUTPUT_BUFFER_SIZE		5 * 1024
+
+#define VERSION_MAJOR			0
+#define VERSION_MINOR			1
+#define VERSION_PATCH			0
+
+bool g_verbose;
 
 int main(int argc, char **argv) {
 	math_core_init();
@@ -20,8 +27,8 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	printf("Sigma algebra engine v0.0.1.\n"
-		   "Type \"help\" for more information and \"q\" to quit.\n");
+	printf("Sigma algebra engine v%d.%d.%d.\n"
+		   "Type \"help\" for more information and \"q\" to quit.\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 
 	while (1) {
 		int ret = cli_get_line("> ", in_buf, INPUT_BUFFER_SIZE);
@@ -38,10 +45,23 @@ int main(int argc, char **argv) {
 			continue;
 		}
 
+		if (strcmp(in_buf, "version") == 0) {
+			log_info("Sigma algebra engine v%d.%d.%d.", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+			continue;
+		}
+
+		if (strcmp(in_buf, "verbose") == 0) {
+			g_verbose = !g_verbose;
+			log_info("Verbose mode %s.", g_verbose ? "enabled" : "disabled");
+			continue;
+		}
+
 		if (strcmp(in_buf, "help") == 0) {
 			log_info("%-35sShow this message", "help");
 			log_info("%-35sQuit the program", "q");
 			log_info("%-35sShow git repository", "repo");
+			log_info("%-35sShow version", "version");
+			log_info("%-35sToggle verbose mode", "verbose");
 			log_info("%-35sDerive a function (short: '<function>)", "derive[<function>(,<variable>)]");
 			log_info("%-35sEvaluate a constant expression (short: <function>)\n", "const[<function>]");
 			continue;

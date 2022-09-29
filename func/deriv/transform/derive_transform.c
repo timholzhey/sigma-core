@@ -21,6 +21,7 @@ void derive_transform_init() {
 	pattern_registry_add_rule(&derive_registry_gen2, "SIN", "~SIN,(FUNC) > COS,$1,-");
 	pattern_registry_add_rule(&derive_registry_gen2, "COS", "~COS,(FUNC) > SUB,[NUM=0],SIN,-,-,$1,-");
 	pattern_registry_add_rule(&derive_registry_gen2, "LOG", "~LOG,(FUNC) > DIV,[NUM=1],$1");
+	pattern_registry_add_rule(&derive_registry_gen2, "LN", "~LN,(FUNC) > DIV,[NUM=1],$1");
 	pattern_registry_add_rule(&derive_registry_gen2, "E", "~POW,E,(FUNC) > POW,E,$1");
 	pattern_registry_add_rule(&derive_registry_gen2, "SQRT", "~SQRT,(FUNC) > DIV,[NUM=1],MUL,-,-,[NUM=2],SQRT,-,-,-,-,-,-,$1");
 

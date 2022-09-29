@@ -9,4 +9,6 @@
 
 retval_t eval_const(ast_node_t *ast);
 
+double eval_const_x(ast_node_t *ast, double x);
+
 #endif //SIGMA_CORE_MATH_EVAL_CONST_H

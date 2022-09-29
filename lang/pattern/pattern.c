@@ -31,7 +31,7 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 		return RETVAL_OK;
 	}
 
-	log_debug("Transform %s", pattern->name);
+	log_debug("Applying Transform %s", pattern->name);
 
 	ast_node_t ast_out;
 	if (pattern_replace(ast, pattern, &ast_out) != RETVAL_OK) {

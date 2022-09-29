@@ -6,6 +6,7 @@
 #define SIGMA_CORE_MATH_LANG_DEF_H
 
 #include <stdint.h>
+#include "sigma.h"
 
 #define TOKEN_MAX_STR_REPR_LENGTH	32
 #define TOKEN_MAX_STR_IDENT_LENGTH	32
@@ -61,12 +62,6 @@ typedef struct {
 	token_value_t value;
 	token_value_type_t value_type;
 } token_t;
-
-typedef enum {
-	RETVAL_OK,
-	RETVAL_ERROR,
-	RETVAL_COUNT,
-} retval_t;
 
 #define TOKEN_FLAG_NONE					0x00
 #define TOKEN_FLAG_PREFIX				0x01

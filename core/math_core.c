@@ -3,6 +3,7 @@
 //
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include "func_derive.h"
 #include "math_core.h"
 #include "math_lang_def.h"
@@ -13,6 +14,7 @@
 #include "math_evaluator.h"
 #include "math_stringify.h"
 #include "func_const.h"
+#include "plot_ascii_graph.h"
 
 #define MAX_NUM_TOKENS 1000
 
@@ -32,6 +34,42 @@ const char *retval_string[RETVAL_COUNT] = {
 		[RETVAL_ERROR] = "Error",
 };
 
+retval_t math_parse(const char *func_str, char var, ast_node_t *ast) {
+	if (!module_initialized) {
+		log_error("Sigma: Module is not initialized");
+		return RETVAL_ERROR;
+	}
+
+	token_t tokens[MAX_NUM_TOKENS];
+	int num_tokens = 0;
+
+	lexer_set_var(var);
+
+	retval_t lex_ret = lang_lex(func_str, tokens, &num_tokens, MAX_NUM_TOKENS);
+	if (lex_ret != RETVAL_OK) {
+		log_error("Error: Lexer returned %s (%d)\n", retval_string[lex_ret], lex_ret);
+		return RETVAL_ERROR;
+	}
+
+	token_t processed_tokens[MAX_NUM_TOKENS];
+	int num_processed_tokens = 0;
+
+	retval_t preprocess_ret = lang_preprocess(tokens, num_tokens, processed_tokens, &num_processed_tokens,
+											  MAX_NUM_TOKENS);
+	if (preprocess_ret != RETVAL_OK) {
+		log_error("Error: Preprocessor returned %s (%d)\n", retval_string[preprocess_ret], preprocess_ret);
+		return RETVAL_ERROR;
+	}
+
+	retval_t parse_ret = lang_parse(processed_tokens, num_processed_tokens, ast);
+	if (parse_ret != RETVAL_OK) {
+		log_error("Error: Parser returned %s (%d)\n", retval_string[parse_ret], parse_ret);
+		return RETVAL_ERROR;
+	}
+
+	return RETVAL_OK;
+}
+
 const char *math_function(const char *func_str, char var, math_function_t sigma_func) {
 	if (!module_initialized) {
 		log_error("Sigma: Module is not initialized");
@@ -41,6 +79,12 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 	if (sigma_func >= MATH_FUNCTION_COUNT) {
 		log_error("Unknown sigma function %u", sigma_func);
 		return "ERR";
+	}
+
+	if (sigma_func == MATH_FUNCTION_PLOT) {
+		char *output = NULL;
+		retval_t ret = plot_ascii_graph(func_str, &output);
+		return output;
 	}
 
 	token_t tokens[MAX_NUM_TOKENS];

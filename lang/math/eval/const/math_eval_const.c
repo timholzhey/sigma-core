@@ -22,6 +22,91 @@
 	ast->left = NULL; \
 	ast->right = NULL;
 
+double eval_const_x(ast_node_t *ast, double x) {
+	if (ast == NULL) {
+		log_error("AST is NULL");
+		return 0.0;
+	}
+
+	switch (ast->token.type) {
+		case TOKEN_TYPE_OPERATOR_ADD:
+			return eval_const_x(ast->left, x) + eval_const_x(ast->right, x);
+
+		case TOKEN_TYPE_OPERATOR_SUB:
+			return eval_const_x(ast->left, x) - eval_const_x(ast->right, x);
+
+		case TOKEN_TYPE_OPERATOR_MUL:
+			return eval_const_x(ast->left, x) * eval_const_x(ast->right, x);
+
+		case TOKEN_TYPE_OPERATOR_DIV:
+			return eval_const_x(ast->left, x) / eval_const_x(ast->right, x);
+
+		case TOKEN_TYPE_OPERATOR_POW:
+			return pow(eval_const_x(ast->left, x), eval_const_x(ast->right, x));
+
+		case TOKEN_TYPE_OPERATOR_MOD:
+			return fmod(eval_const_x(ast->left, x), eval_const_x(ast->right, x));
+
+		case TOKEN_TYPE_FUNC_SIN:
+			return sin(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_COS:
+			return cos(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_TAN:
+			return tan(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_ASIN:
+			return asin(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_ACOS:
+			return acos(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_ATAN:
+			return atan(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_SINH:
+			return sinh(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_COSH:
+			return cosh(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_TANH:
+			return tanh(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_LN: // Intentional fallthrough
+		case TOKEN_TYPE_FUNC_LOG:
+			return log(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_SQRT:
+			return sqrt(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_FUNC_FACT:
+			log_error("TOKEN_TYPE_FUNC_FACT const eval not implemented");
+			break;
+
+		case TOKEN_TYPE_FUNC_ABS:
+			return fabs(eval_const_x(ast->left, x));
+
+		case TOKEN_TYPE_CONST_E:
+			return M_E;
+
+		case TOKEN_TYPE_CONST_PI:
+			return M_PI;
+
+		case TOKEN_TYPE_VAR:
+			return x;
+
+		case TOKEN_TYPE_NUM:
+			return ast->token.value.number;
+
+		default:
+			break;
+	}
+
+	return 0.0;
+}
+
 retval_t eval_const(ast_node_t *ast) {
 	if (ast == NULL) {
 		log_error("AST is NULL");
