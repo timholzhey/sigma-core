@@ -25,8 +25,10 @@
 
 #if defined(DEBUG_GLOBAL) && DEBUG_GLOBAL == 1
 #define log_debug(...)				if (g_verbose) log_internal(LOG_COLOR_RESET, __VA_ARGS__);
+#define log_debug_noterm(...)		if (g_verbose) log_internal_noterm(LOG_COLOR_RESET, __VA_ARGS__);
 #else
 #define log_debug(...)
+#define log_debug_noterm(...)
 #endif
 
 #define log_info(...)				log_internal(LOG_COLOR_RESET, __VA_ARGS__);

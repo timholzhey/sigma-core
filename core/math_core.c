@@ -70,6 +70,32 @@ retval_t math_parse(const char *func_str, char var, ast_node_t *ast) {
 	return RETVAL_OK;
 }
 
+static void print_ast(ast_node_t *ast) {
+	if (ast == NULL) {
+		return;
+	}
+
+	log_debug_noterm("[%s]", token_type_name_map[ast->token.type]);
+
+	if (ast->left != NULL) {
+		log_debug_noterm(" [%s]", token_type_name_map[ast->left->token.type]);
+	}
+
+	if (ast->right != NULL) {
+		log_debug_noterm(" [%s]", token_type_name_map[ast->right->token.type]);
+	}
+
+	if (ast->left != NULL) {
+		log_debug_noterm(" ");
+		print_ast(ast->left);
+	}
+
+	if (ast->right != NULL) {
+		log_debug_noterm(" ");
+		print_ast(ast->right);
+	}
+}
+
 const char *math_function(const char *func_str, char var, math_function_t sigma_func) {
 	if (!module_initialized) {
 		log_error("Sigma: Module is not initialized");
@@ -98,6 +124,12 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 		return "ERR";
 	}
 
+	log_debug_noterm("Lexer: ");
+	for (int i = 0; i < num_tokens; i++) {
+		log_debug_noterm("[%s] ", token_type_name_map[tokens[i].type]);
+	}
+	log_debug_noterm("\n");
+
 	token_t processed_tokens[MAX_NUM_TOKENS];
 	int num_processed_tokens = 0;
 
@@ -108,6 +140,12 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 		return "ERR";
 	}
 
+	log_debug_noterm("Preprocessor: ");
+	for (int i = 0; i < num_processed_tokens; i++) {
+		log_debug_noterm("[%s] ", token_type_name_map[processed_tokens[i].type]);
+	}
+	log_debug_noterm("\n");
+
 	ast_node_t ast_in = {0};
 
 	retval_t parse_ret = lang_parse(processed_tokens, num_processed_tokens, &ast_in);
@@ -116,6 +154,10 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 		return "ERR";
 	}
 
+	log_debug_noterm("Parser: ");
+	print_ast(&ast_in);
+	log_debug_noterm("\n");
+
 	ast_node_t ast_out = {0};
 
 	retval_t eval_ret = lang_eval(&ast_in, &ast_out, sigma_func);
@@ -123,6 +165,10 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 		log_error("Error: Evaluator returned %s (%d)\n", retval_string[eval_ret], eval_ret);
 		return "ERR";
 	}
+
+	log_debug_noterm("Transformed: ");
+	print_ast(&ast_out);
+	log_debug_noterm("\n");
 
 	char *string = NULL;
 	int str_len = 0;
