@@ -40,26 +40,11 @@ retval_t plot_ascii_graph(const char *input, char **output) {
 
 	retval_t ret = math_parse(input, 'x', &ast);
 
-	const char *derivative = derive(input, 'x');
-
-	ast_node_t ast_derivative = {0};
-
-	if (derivative) {
-		ret = math_parse(derivative, 'x', &ast_derivative);
-	}
-
 	// Sample function values
 	double fx_values[GRID_WIDTH];
 	for (int i = 0; i < GRID_WIDTH; i++) {
 		float x = GRID_X_MIN + (float)i / (float)GRID_WIDTH * (GRID_X_MAX - GRID_X_MIN);
 		fx_values[i] = eval_const_x(&ast, x);
-	}
-
-	// Sample derivative values
-	double fx_derivative_values[GRID_WIDTH];
-	for (int i = 0; i < GRID_WIDTH; i++) {
-		float x = GRID_X_MIN + (float)i / (float)GRID_WIDTH * (GRID_X_MAX - GRID_X_MIN);
-		fx_derivative_values[i] = eval_const_x(&ast_derivative, x);
 	}
 
 	// fill in dots for function values
@@ -68,19 +53,8 @@ retval_t plot_ascii_graph(const char *input, char **output) {
 		float y = fx_values[i];
 		int grid_x = i;
 		int grid_y = (int)((y - GRID_Y_MIN) / (GRID_Y_MAX - GRID_Y_MIN) * GRID_HEIGHT);
-		double dy = fx_derivative_values[i];
-		char c;
-		if (dy < 0.1 && dy > -0.1) {
-			c = '_';
-		} else if (dy > 5 || dy < -5) {
-			c = '|';
-		} else if (dy > 0) {
-			c = '/';
-		} else {
-			c = '\\';
-		}
 		if (grid_y >= 0 && grid_y < GRID_HEIGHT) {
-			grid[(GRID_HEIGHT - grid_y) * (GRID_WIDTH + 1) + grid_x] = c;
+			grid[(GRID_HEIGHT - grid_y) * (GRID_WIDTH + 1) + grid_x] = '*';
 		}
 	}
 
