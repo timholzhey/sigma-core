@@ -30,6 +30,12 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "~SUB_NEG", "SUB,(ANY),SUB,-,-,(NUM=0),(ANY) > ADD,$1,$3");
 	pattern_registry_add_rule(&const_registry, "ADD_VAR_PROD", "ADD,MUL,VAR,(NUM),VAR > MUL,ADD,VAR,$1,[NUM=1]");
 	pattern_registry_add_rule(&const_registry, "ADD_VAR_PROD2", "ADD,MUL,VAR,(NUM),VAR,-,- > MUL,ADD,VAR,$1,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "SQUARE_SQRT", "POW,SQRT,(NUM=2),(ANY) > $2");
+	pattern_registry_add_rule(&const_registry, "MUL_SQRT", "MUL,SQRT,SQRT,VAR,-,VAR,- > VAR");
+	pattern_registry_add_rule(&const_registry, "LN_EXP", "LN,POW,-,E,(ANY) > $1");
+	pattern_registry_add_rule(&const_registry, "LOG_EXP", "LOG,POW,-,E,(ANY) > $1");
+	pattern_registry_add_rule(&const_registry, "EXP_LN", "POW,E,LN,-,-,(ANY) > $1");
+	pattern_registry_add_rule(&const_registry, "EXP_LOG", "POW,E,LOG,-,-,(ANY) > $1");
 
 	pattern_registry_add_rule(&const_registry, "BINOM_1", "~POW,ADD,(NUM=2),(ANY),(ANY) > "
 														  "ADD,"

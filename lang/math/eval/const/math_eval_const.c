@@ -235,15 +235,15 @@ retval_t eval_const(ast_node_t *ast) {
 			RESULT_NUMBER;
 			break;
 
-		case TOKEN_TYPE_CONST_E:
-			ast->token.value.number = M_E;
-			RESULT_NUMBER;
-			break;
-
-		case TOKEN_TYPE_CONST_PI:
-			ast->token.value.number = M_PI;
-			RESULT_NUMBER;
-			break;
+//		case TOKEN_TYPE_CONST_E:
+//			ast->token.value.number = M_E;
+//			RESULT_NUMBER;
+//			break;
+//
+//		case TOKEN_TYPE_CONST_PI:
+//			ast->token.value.number = M_PI;
+//			RESULT_NUMBER;
+//			break;
 
 		default:
 			break;

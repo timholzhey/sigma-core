@@ -12,6 +12,7 @@ void derive_transform_init() {
 	pattern_registry_add_rule(&derive_registry_gen1, "CONST_SUB", "SUB,(NUM),(ANY) > $2");
 
 	pattern_registry_add_rule(&derive_registry_gen2, "PRODUCT", "@MUL,(FUNC),(FUNC) > ADD,MUL,MUL,$1,*$2,*$1,$2");
+	pattern_registry_add_rule(&derive_registry_gen2, "QUOTIENT", "@DIV,(FUNC),(FUNC) > DIV,SUB,POW,MUL,MUL,$2,[NUM=2],$2,*$1,$1,*$2");
 	pattern_registry_add_rule(&derive_registry_gen2, "CHAIN", "@(FUNC),(FUNC) > MUL,*$1,*$2");
 	pattern_registry_add_rule(&derive_registry_gen2, "CHAIN_2", "@(FUNC),(!NUM),(FUNC) > MUL,*$1,*$3");
 
