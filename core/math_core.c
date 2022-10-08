@@ -75,25 +75,25 @@ static void print_ast(ast_node_t *ast) {
 		return;
 	}
 
-	log_debug_noterm("[%s]", token_type_name_map[ast->token.type]);
+	int i = 0;
+	int lookahead = 0;
+	ast_node_t *node = ast_get_node_by_index(ast, i);
 
-	if (ast->left != NULL) {
-		log_debug_noterm(" [%s]", token_type_name_map[ast->left->token.type]);
+	while (node != NULL || lookahead < 100) {
+		if (node == NULL) {
+			lookahead++;
+		} else {
+			if (lookahead > 0) {
+				for (int j = 0; j < lookahead; j++) {
+					log_debug_noterm("[%s] ", token_type_name_map[0]);
+				}
+			}
+			log_debug_noterm("[%s] ", token_type_name_map[node->token.type]);
+			lookahead = 0;
+		}
+		node = ast_get_node_by_index(ast, ++i);
 	}
-
-	if (ast->right != NULL) {
-		log_debug_noterm(" [%s]", token_type_name_map[ast->right->token.type]);
-	}
-
-	if (ast->left != NULL) {
-		log_debug_noterm(" ");
-		print_ast(ast->left);
-	}
-
-	if (ast->right != NULL) {
-		log_debug_noterm(" ");
-		print_ast(ast->right);
-	}
+	log_debug_noterm("\n");
 }
 
 const char *math_function(const char *func_str, char var, math_function_t sigma_func) {
@@ -156,7 +156,6 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 
 	log_debug_noterm("Parser: ");
 	print_ast(&ast_in);
-	log_debug_noterm("\n");
 
 	ast_node_t ast_out = {0};
 
@@ -168,7 +167,6 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 
 	log_debug_noterm("Transformed: ");
 	print_ast(&ast_out);
-	log_debug_noterm("\n");
 
 	char *string = NULL;
 	int str_len = 0;
