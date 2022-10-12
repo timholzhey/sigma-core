@@ -7,7 +7,7 @@
 #include "sigma_compile.h"
 
 #define INPUT_BUFFER_SIZE		1024
-#define OUTPUT_BUFFER_SIZE		5 * 1024
+#define OUTPUT_BUFFER_SIZE		(5 * 1024)
 
 #define VERSION_MAJOR			0
 #define VERSION_MINOR			1
@@ -22,9 +22,29 @@ int main(int argc, char **argv) {
 	char out_buf[OUTPUT_BUFFER_SIZE];
 
 	if (argc > 1) {
-		sigma_compile(argv[1], out_buf, OUTPUT_BUFFER_SIZE);
-		printf("%s\n", out_buf);
-		return 0;
+		while (*++argv) {
+			if (strcmp(*argv, "-v") == 0) {
+				g_verbose = true;
+			} else if (strcmp(*argv, "--version") == 0) {
+				log_info("Sigma algebra engine v%d.%d.%d.", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+				return 0;
+			} else if (strcmp(*argv, "-c") == 0) {
+					++argv;
+					if (!*argv) {
+						log_error("Expected input after -c");
+						return 1;
+					}
+					if (sigma_compile(*argv, out_buf, OUTPUT_BUFFER_SIZE) != RETVAL_OK) {
+						log_error("Error compiling input");
+						return 1;
+					}
+					printf("%s\n", out_buf);
+					return 0;
+			} else {
+				log_error("Unknown argument: %s", *argv);
+				return 1;
+			}
+		}
 	}
 
 	printf("Sigma algebra engine v%d.%d.%d.\n"
