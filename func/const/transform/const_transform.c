@@ -20,22 +20,25 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "MUL_1", "MUL,(ANY),(NUM=1) > $1");
 	pattern_registry_add_rule(&const_registry, "DIV_BY_1", "~DIV,(ANY),(NUM=1) > $1");
 	pattern_registry_add_rule(&const_registry, "DIV_BY_0", "~DIV,(ANY),(NUM=0) > ERR: Division by zero");
-	pattern_registry_add_rule(&const_registry, "VAR_MUL", "MUL,VAR,VAR > POW,VAR,[NUM=2]");
-	pattern_registry_add_rule(&const_registry, "VAR_ADD", "ADD,VAR,VAR > MUL,[NUM=2],VAR");
-	pattern_registry_add_rule(&const_registry, "VAR_ADD_MULTIPLES", "ADD,MUL,MUL,(NUM),VAR,(NUM),VAR > MUL,[ADD,$1,$2],VAR");
-	pattern_registry_add_rule(&const_registry, "VAR_SUB", "SUB,VAR,VAR > [NUM=0]");
-	pattern_registry_add_rule(&const_registry, "VAR_DIV", "DIV,VAR,VAR > [NUM=1]");
-	pattern_registry_add_rule(&const_registry, "VAR_MUL_POWERS", "MUL,POW,POW,VAR,(NUM),VAR,(NUM) > POW,VAR,[ADD,$1,$2]");
 	pattern_registry_add_rule(&const_registry, "ADD_NEGATIVE", "ADD,(ANY),SUB,-,-,(NUM=0),(ANY) > SUB,$1,$3");
-	pattern_registry_add_rule(&const_registry, "~SUB_NEG", "SUB,(ANY),SUB,-,-,(NUM=0),(ANY) > ADD,$1,$3");
-	pattern_registry_add_rule(&const_registry, "ADD_VAR_PROD", "ADD,MUL,VAR,(NUM),VAR > MUL,ADD,VAR,$1,[NUM=1]");
-	pattern_registry_add_rule(&const_registry, "ADD_VAR_PROD2", "ADD,MUL,VAR,(NUM),VAR,-,- > MUL,ADD,VAR,$1,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "SUB_NEG", "~SUB,(ANY),SUB,-,-,(NUM=0),(ANY) > ADD,$1,$3");
 	pattern_registry_add_rule(&const_registry, "SQUARE_SQRT", "POW,SQRT,(NUM=2),(ANY) > $2");
-	pattern_registry_add_rule(&const_registry, "MUL_SQRT", "MUL,SQRT,SQRT,VAR,-,VAR,- > VAR");
 	pattern_registry_add_rule(&const_registry, "LN_EXP", "LN,POW,-,E,(ANY) > $1");
 	pattern_registry_add_rule(&const_registry, "LOG_EXP", "LOG,POW,-,E,(ANY) > $1");
 	pattern_registry_add_rule(&const_registry, "EXP_LN", "POW,E,LN,-,-,(ANY) > $1");
 	pattern_registry_add_rule(&const_registry, "EXP_LOG", "POW,E,LOG,-,-,(ANY) > $1");
+
+	pattern_registry_add_rule(&const_registry, "ADD_SAME", "ADD,(?ANY),(?ANY) > MUL,[NUM=2],$1");
+	pattern_registry_add_rule(&const_registry, "SUB_SAME", "SUB,(?ANY),(?ANY) > [NUM=0]");
+	pattern_registry_add_rule(&const_registry, "MUL_SAME", "MUL,(?ANY),(?ANY) > POW,$1,[NUM=2]");
+	pattern_registry_add_rule(&const_registry, "DIV_SAME", "DIV,(?ANY),(?ANY) > [NUM=1]");
+	pattern_registry_add_rule(&const_registry, "ADD_SAME_MULTIPLES", "ADD,MUL,MUL,(NUM),(?ANY),(NUM),(?ANY) > MUL,[ADD,$1,$3],$2");
+	pattern_registry_add_rule(&const_registry, "MUL_SAME_POWERS", "MUL,POW,POW,(?ANY),(NUM),(?ANY),(NUM) > POW,$1,[ADD,$2,$4]");
+	pattern_registry_add_rule(&const_registry, "ADD_SAME_PROD", "ADD,MUL,(?ANY),(NUM),(?ANY) > MUL,ADD,$1,$2,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "ADD_SAME_PROD2", "ADD,(?ANY),MUL,ANY,ANY,(NUM),(?ANY) > MUL,ADD,$1,$2,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "SUB_SAME_PROD", "~SUB,MUL,(?ANY),(NUM),(?ANY) > MUL,SUB,$1,$2,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "SUB_SAME_PROD2", "~SUB,(?ANY),MUL,ANY,ANY,(NUM),(?ANY) > MUL,SUB,$1,[NUM=1],$2");
+	pattern_registry_add_rule(&const_registry, "MUL_SAME_SQRT", "MUL,SQRT,SQRT,(?ANY),-,(?ANY),- > $1");
 
 	pattern_registry_add_rule(&const_registry, "BINOM_1", "~POW,ADD,(NUM=2),(ANY),(ANY) > "
 														  "ADD,"
