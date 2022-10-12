@@ -41,9 +41,17 @@ static retval_t pattern_generate_permutations(pattern_t *pattern_in, pattern_t *
 			if (right_idx >= num_nodes) {
 				break;
 			}
+
 			memcpy(temp, &new_pattern->match[left_idx], subtree_len * sizeof(pattern_node_t));
 			memcpy(&new_pattern->match[left_idx], &new_pattern->match[right_idx], subtree_len * sizeof(pattern_node_t));
 			memcpy(&new_pattern->match[right_idx], temp, subtree_len * sizeof(pattern_node_t));
+
+			if (new_pattern->match[left_idx].is_same && new_pattern->match[left_idx].equal_idx == left_idx) {
+				new_pattern->match[left_idx].equal_idx = right_idx;
+			} else if (new_pattern->match[right_idx].is_same && new_pattern->match[right_idx].equal_idx == right_idx) {
+				new_pattern->match[right_idx].equal_idx = left_idx;
+			}
+
 			subtree_len *= 2;
 		}
 

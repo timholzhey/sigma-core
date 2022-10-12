@@ -31,6 +31,8 @@ struct pattern_node_t {
 	pattern_node_type_t type;
 	uint8_t has_number:1;
 	uint8_t is_inverted:1;
+	uint8_t is_same:1;
+	int equal_idx;
 	char *error_desc;
 	uint8_t error_desc_len;
 	double number;

@@ -19,8 +19,9 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 	memset(pattern, 0, sizeof(pattern_t));
 	char tok_buf[50];
 	int tok_buf_pos = 0;
+	int same_at_index = -1;
 	bool do_capture = false, do_eval = false, do_access_capture = false, do_match_number = false,
-		was_access_capture = false, do_error = false, do_invert = false;
+		was_access_capture = false, do_error = false, do_invert = false, do_same = false;
 	pattern_node_t *pattern_nodes = pattern->match;
 	pattern_node_t replacement_nodes[100];
 	uint8_t *pattern_node_pos = &pattern->num_match_nodes;
@@ -67,6 +68,12 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			continue;
 		}
 
+		if (rule[i] == '?') {
+			do_same = true;
+			tok_buf_pos = 0;
+			continue;
+		}
+
 		if (rule[i] == '*') {
 			pattern->propagation_indices[pattern->num_propagation_indices++] = *pattern_node_pos;
 			tok_buf_pos = 0;
@@ -101,6 +108,8 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 					store_node->type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 					store_node->has_number = 1;
 					store_node->is_inverted = do_invert;
+					store_node->is_same = do_same;
+					store_node->equal_idx = same_at_index;
 					tok_buf[tok_buf_pos] = '\0';
 					store_node->number = strtod(tok_buf, NULL);
 
@@ -124,6 +133,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				pattern_nodes[*pattern_node_pos].num_replacement_nodes = replacement_node_pos;
 				do_eval = false;
 				do_invert = false;
+				do_same = false;
 				tok_buf_pos = 0;
 				replacement_node_pos = 0;
 				(*pattern_node_pos)++;
@@ -148,6 +158,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			(*store_node_pos)++;
 			do_access_capture = false;
 			do_invert = false;
+			do_same = false;
 			tok_buf_pos = 0;
 			i++;
 			continue;
@@ -157,6 +168,12 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			 (rule[i] == '=' && (do_capture || do_eval)) || i == rule_len - 1) && tok_buf_pos > 0) {
 			pattern_nodes[*pattern_node_pos].type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 			store_node->is_inverted = do_invert;
+			store_node->is_same = do_same;
+			if (do_same && same_at_index < 0) {
+				store_node->is_same = false;
+				same_at_index = *store_node_pos;
+			}
+			store_node->equal_idx = same_at_index;
 
 			if (do_match_number) {
 				do_match_number = false;
@@ -240,6 +257,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			}
 
 			do_invert = false;
+			do_same = false;
 			tok_buf_pos = 0;
 			(*store_node_pos)++;
 			continue;
