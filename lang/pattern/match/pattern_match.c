@@ -2,6 +2,7 @@
 // Created by Tim Holzhey on 26.08.22.
 //
 
+#include <string.h>
 #include "pattern_match.h"
 #include "logging.h"
 
@@ -30,6 +31,9 @@ static bool ast_nodes_are_equal(ast_node_t *a, ast_node_t *b) {
 	}
 	if (a->token.type == TOKEN_TYPE_NUM) {
 		return a->token.value.number == b->token.value.number;
+	}
+	if (a->token.type == TOKEN_TYPE_USER_VAR) {
+		return strcmp(a->token.value.identifier, b->token.value.identifier) == 0;
 	}
 	return ast_nodes_are_equal(a->left, b->left) && ast_nodes_are_equal(a->right, b->right);
 }

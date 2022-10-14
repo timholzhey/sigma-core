@@ -21,11 +21,19 @@ static struct {
 	int error_desc_len;
 } m_stringify;
 
+static const char *get_token_str_repr(token_t *token) {
+	if (token->type == TOKEN_TYPE_USER_VAR) {
+		return token->value.identifier;
+	}
+
+	return token_str_repr_map[token->type];
+}
+
 int stringify_node(ast_node_t *ast, char *string, int size_left) {
 	int chars_written = 0;
 
 	if (token_flags_map[ast->token.type] & TOKEN_FLAG_SURROUND) {
-		chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
+		chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", get_token_str_repr(&ast->token));
 	}
 
 	bool paren_precedence = false;
@@ -66,7 +74,7 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 		case TOKEN_TYPE_OPERATOR_MUL:
 			if (!(ast->left && token_flags_map[ast->left->token.type] & TOKEN_FLAG_IMPL_MUL_AFTER &&
 				  ast->right && token_flags_map[ast->right->token.type] & TOKEN_FLAG_IMPL_MUL_BEFORE)) {
-				chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
+				chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", get_token_str_repr(&ast->token));
 			}
 			break;
 
@@ -77,7 +85,7 @@ int stringify_node(ast_node_t *ast, char *string, int size_left) {
 			return chars_written;
 
 		default:
-			chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", token_str_repr_map[ast->token.type]);
+			chars_written += snprintf(string + chars_written, size_left - chars_written, "%s", get_token_str_repr(&ast->token));
 			break;
 	}
 

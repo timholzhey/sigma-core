@@ -51,6 +51,21 @@ typedef enum {
 	return RETVAL_ERROR; \
 }
 
+static str_match_partial_ret_t is_string_valid_user_var_name(const char *buf, size_t buf_len) {
+	if (buf_len > TOKEN_MAX_STR_IDENT_LENGTH) {
+		return STR_MATCH_NO_MATCH;
+	}
+
+	for (int i = 0; i < buf_len; i++) {
+		if (!(buf[i] >= 'A' && buf[i] <= 'Z') &&
+			!(buf[i] >= 'a' && buf[i] <= 'z')) {
+			return STR_MATCH_NO_MATCH;
+		}
+	}
+
+	return STR_MATCH_FULL_MATCH;
+}
+
 static str_match_partial_ret_t is_string_number(const char *buf, size_t buf_len, bool sign) {
 	parse_number_state_t state = sign ? PARSE_NUMBER_STATE_SIGN_OPT : PARSE_NUMBER_STATE_DIGIT_REQ;
 
@@ -134,6 +149,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 				best_match = match;
 			}
 		}
+
 		// check var
 		match = str_match_partial(buf, &m_lexer.var, buf_pos, 1);
 		if (match > STR_MATCH_NO_MATCH) {
@@ -143,6 +159,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 			latest_token.type = TOKEN_TYPE_VAR;
 			best_match = match;
 		}
+
 		// check number
 		match = is_string_number(buf, buf_pos, start_of_expression);
 		if (match > STR_MATCH_NO_MATCH) {
@@ -151,14 +168,33 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 		if (match > best_match) {
 			buf[buf_pos] = '\0';
 			double num = strtod(buf, NULL);
-			num_matches++;
 			latest_token.type = TOKEN_TYPE_NUM;
 			latest_token.value_type = TOKEN_VALUE_TYPE_NUMBER;
 			latest_token.value.number = num;
 		}
 
+		// check user var
+		match = is_string_valid_user_var_name(buf, buf_pos);
+		if (match > STR_MATCH_NO_MATCH) {
+			num_matches++;
+		}
+		if (match > best_match) {
+			buf[buf_pos] = '\0';
+			latest_token.type = TOKEN_TYPE_USER_VAR;
+			latest_token.value_type = TOKEN_VALUE_TYPE_IDENTIFIER;
+			latest_token.value.identifier_len = buf_pos;
+			memcpy(latest_token.value.identifier, buf, buf_pos);
+			latest_token.value.identifier[buf_pos] = '\0';
+		}
+
 		if (num_matches == 0 || input_pos == input_len - 1) {
 			if (latest_token.type != TOKEN_TYPE_NONE) {
+				// check for full match
+				if (latest_token.type != TOKEN_TYPE_VAR && latest_token.type != TOKEN_TYPE_NUM && latest_token.type != TOKEN_TYPE_USER_VAR &&
+					buf_pos - ((buf_pos > 1) ? 1 : 0) != strlen(token_str_repr_map[latest_token.type])) {
+					LEXER_FAIL_WITH_MSG("Unexpected token: %.*s", buf_pos, buf);
+				}
+
 				if (*num_tokens > max_num_tokens) {
 					m_lexer.error = LEXER_ERROR_INSUFFICIENT_SPACE;
 					LEXER_FAIL_WITH_MSG("Insufficient space in output tokens");
