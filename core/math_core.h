@@ -23,4 +23,6 @@ retval_t math_parse(const char *func_str, char var, ast_node_t *ast);
 
 const char *math_function(const char *func_str, char var, math_function_t sigma_func);
 
+void debug_print_ast(ast_node_t *ast);
+
 #endif //SIGMA_CORE_MATH_CORE_H

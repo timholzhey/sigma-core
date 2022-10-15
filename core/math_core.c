@@ -70,7 +70,7 @@ retval_t math_parse(const char *func_str, char var, ast_node_t *ast) {
 	return RETVAL_OK;
 }
 
-static void print_ast(ast_node_t *ast) {
+void debug_print_ast(ast_node_t *ast) {
 	if (ast == NULL) {
 		return;
 	}
@@ -155,7 +155,7 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 	}
 
 	log_debug_noterm("Parser: ");
-	print_ast(&ast_in);
+	debug_print_ast(&ast_in);
 
 	ast_node_t ast_out = {0};
 
@@ -166,7 +166,7 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 	}
 
 	log_debug_noterm("Transformed: ");
-	print_ast(&ast_out);
+	debug_print_ast(&ast_out);
 
 	char *string = NULL;
 	int str_len = 0;

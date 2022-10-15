@@ -9,6 +9,7 @@
 #include "logging.h"
 #include <stddef.h>
 #include <string.h>
+#include "math_core.h"
 #include "math_eval_const.h"
 #include "pattern_compile.h"
 #include "pattern_generate.h"
@@ -31,8 +32,6 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 		return RETVAL_OK;
 	}
 
-	log_debug("Applying Transform %s", pattern->name);
-
 	ast_node_t ast_out;
 	if (pattern_replace(ast, pattern, &ast_out) != RETVAL_OK) {
 		log_error("Pattern replacing failed")
@@ -40,6 +39,9 @@ retval_t pattern_apply(ast_node_t *ast, pattern_t *pattern, bool *applied) {
 	}
 
 	memcpy(ast, &ast_out, sizeof(ast_node_t));
+
+	log_debug_noterm("Applying Transform %s: ", pattern->name);
+	debug_print_ast(ast);
 
 	if (eval_const(ast) != RETVAL_OK) {
 		log_error("Constant evaluation failed");
