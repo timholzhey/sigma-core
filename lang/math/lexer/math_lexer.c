@@ -175,7 +175,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 
 		// check user var
 		match = is_string_valid_user_var_name(buf, buf_pos);
-		if (match > STR_MATCH_NO_MATCH) {
+		if (match > STR_MATCH_NO_MATCH && num_matches == 0 && latest_token.type == TOKEN_TYPE_NONE) {
 			num_matches++;
 		}
 		if (match > best_match) {
