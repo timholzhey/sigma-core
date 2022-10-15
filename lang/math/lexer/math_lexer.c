@@ -127,7 +127,7 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 	char buf[512];
 	int buf_pos = 0;
 	size_t input_len = strlen(input);
-	token_t latest_token;
+	token_t latest_token = {0};
 	str_match_partial_ret_t best_match = STR_MATCH_NO_MATCH;
 	bool start_of_expression = true;
 
