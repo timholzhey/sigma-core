@@ -56,6 +56,6 @@ void const_transform_init() {
 														  "-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,[NUM=2],$2");
 
 	pattern_registry_add_rule(&const_registry, "ORDER_ADD_NUM", "~ADD,(NUM),(!NUM) > ADD,$2,$1"); // move constants to the right
-	pattern_registry_add_rule(&const_registry, "ORDER_MUL_NUM", "~MUL,(!NUM),(NUM) > MUL,$2,$1"); // move factors to the left
 	pattern_registry_add_rule(&const_registry, "ORDER_MUL_USER_VAR", "~MUL,(!USER_VAR),(USER_VAR) > MUL,$2,$1"); // move user vars to the left
+	pattern_registry_add_rule(&const_registry, "ORDER_MUL_NUM", "~MUL,(!NUM),(NUM) > MUL,$2,$1"); // move factors to the left
 }

@@ -93,7 +93,6 @@ void debug_print_ast(ast_node_t *ast) {
 		}
 		node = ast_get_node_by_index(ast, ++i);
 	}
-	log_debug_noterm("\n");
 }
 
 const char *math_function(const char *func_str, char var, math_function_t sigma_func) {
@@ -156,6 +155,7 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 
 	log_debug_noterm("Parser: ");
 	debug_print_ast(&ast_in);
+	log_debug_noterm("\n");
 
 	ast_node_t ast_out = {0};
 
@@ -167,6 +167,7 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 
 	log_debug_noterm("Transformed: ");
 	debug_print_ast(&ast_out);
+	log_debug_noterm("\n");
 
 	char *string = NULL;
 	int str_len = 0;

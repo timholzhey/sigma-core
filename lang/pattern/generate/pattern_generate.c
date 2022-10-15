@@ -46,10 +46,12 @@ static retval_t pattern_generate_permutations(pattern_t *pattern_in, pattern_t *
 			memcpy(&new_pattern->match[left_idx], &new_pattern->match[right_idx], subtree_len * sizeof(pattern_node_t));
 			memcpy(&new_pattern->match[right_idx], temp, subtree_len * sizeof(pattern_node_t));
 
-			if (new_pattern->match[left_idx].is_same && new_pattern->match[left_idx].equal_idx == left_idx) {
-				new_pattern->match[left_idx].equal_idx = right_idx;
-			} else if (new_pattern->match[right_idx].is_same && new_pattern->match[right_idx].equal_idx == right_idx) {
-				new_pattern->match[right_idx].equal_idx = left_idx;
+			for (int j = 0; j < num_nodes; j++) {
+				if (new_pattern->match[j].is_same && new_pattern->match[j].equal_idx == left_idx) {
+					new_pattern->match[j].equal_idx = right_idx;
+				} else if (new_pattern->match[j].is_same && new_pattern->match[j].equal_idx == right_idx) {
+					new_pattern->match[j].equal_idx = left_idx;
+				}
 			}
 
 			subtree_len *= 2;
@@ -75,6 +77,9 @@ static void pattern_cleanup_permutations(pattern_t *patterns, int *num_patterns)
 		for (int j = i + 1; j < *num_patterns; j++) {
 			bool is_match = true;
 			for (int k = 0; k < patterns[i].num_match_nodes; k++) {
+				if (patterns[i].match[k].is_same && patterns[i].match[k].equal_idx == k) {
+					log_error("error in pattern %s at %d:%d", patterns[i].name, i, k);
+				}
 				if (patterns[i].match[k].token_type != patterns[j].match[k].token_type) {
 					is_match = false;
 					break;

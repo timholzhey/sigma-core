@@ -10,7 +10,7 @@
 #include "logging.h"
 
 #define SIGMA_ERROR_AT(x) \
-	log_info(input);        \
+	log_info("%s", input);        \
 	log_info_noterm("%*s", x - 1, ""); \
 	log_info_noterm("^\n");     \
 
