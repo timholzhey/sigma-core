@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Derivative solver</title>
+</head>
+<body>
+    <h1>Derivative solver</h1>
+    <input type="text" id="inputFunction" placeholder="Enter function" autofocus>
+    <input type="text" id="inputVariable" placeholder="Enter variable" value="x">
+    <p id="output"></p>
+</body>
+<script>
+    const functionInput = document.getElementById('inputFunction');
+    const variableInput = document.getElementById('inputVariable');
+    const functionOutput = document.getElementById('output');
+
+    const apiCall = () => {
+        const functionValue = functionInput.value;
+        // make post request to /solve api endpoint with form data containing function and variable
+        fetch(`/solve`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `function=${encodeURIComponent(functionValue)}&variable=${encodeURIComponent(variableInput.value)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                functionOutput.innerText = data.output;
+                functionOutput.classList.remove(...functionOutput.classList);
+                functionOutput.classList.add(data.status);
+            });
+    };
+
+    functionInput.addEventListener('input', apiCall);
+    variableInput.addEventListener('input', apiCall);
+</script>
+<style>
+    .success {
+        color: green;
+    }
+    .error {
+        color: red;
+    }
+</style>
+</html>

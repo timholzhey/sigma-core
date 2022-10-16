@@ -78,7 +78,7 @@ static void pattern_cleanup_permutations(pattern_t *patterns, int *num_patterns)
 			bool is_match = true;
 			for (int k = 0; k < patterns[i].num_match_nodes; k++) {
 				if (patterns[i].match[k].is_same && patterns[i].match[k].equal_idx == k) {
-					log_error("error in pattern %s at %d:%d", patterns[i].name, i, k);
+					// log_error("error in pattern %s at %d:%d", patterns[i].name, i, k);
 				}
 				if (patterns[i].match[k].token_type != patterns[j].match[k].token_type) {
 					is_match = false;

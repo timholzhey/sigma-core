@@ -39,8 +39,6 @@ include_directories(
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/plot
-
         ${CMAKE_CURRENT_SOURCE_DIR}/util
 )
 
@@ -49,6 +47,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/math_core.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/plot_ascii_graph.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/lexer/math_lexer.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/parser/math_parser.c
@@ -74,8 +73,6 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/impl/func_const.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform/const_transform.c
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/plot/plot_ascii_graph.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/util/io.c
 )

@@ -29,17 +29,17 @@ int main(int argc, char **argv) {
 				log_info("Sigma algebra engine v%d.%d.%d.", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 				return 0;
 			} else if (strcmp(*argv, "-c") == 0) {
-					++argv;
-					if (!*argv) {
-						log_error("Expected input after -c");
-						return 1;
-					}
-					if (sigma_compile(*argv, out_buf, OUTPUT_BUFFER_SIZE) != RETVAL_OK) {
-						log_error("Error compiling input");
-						return 1;
-					}
-					printf("%s\n", out_buf);
-					return 0;
+				++argv;
+				if (!*argv) {
+					log_error("Expected input after -c");
+					return 1;
+				}
+				if (sigma_compile(*argv, out_buf, OUTPUT_BUFFER_SIZE) != RETVAL_OK) {
+					log_error("Error compiling input");
+					return 1;
+				}
+				printf("%s\n", out_buf);
+				return 0;
 			} else {
 				log_error("Unknown argument: %s", *argv);
 				return 1;

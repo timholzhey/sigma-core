@@ -25,6 +25,7 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform/const_transform.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/testlib.c
+
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_lexer.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_parser.c
