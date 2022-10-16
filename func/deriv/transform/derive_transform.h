@@ -7,8 +7,7 @@
 
 #include "pattern.h"
 
-extern pattern_registry_t derive_registry_gen1;
-extern pattern_registry_t derive_registry_gen2;
+extern pattern_registry_t derive_registry;
 
 void derive_transform_init();
 

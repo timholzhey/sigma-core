@@ -49,9 +49,12 @@ static bool pattern_match_node(ast_node_t *root, ast_node_t *ast, pattern_node_t
 	if (num_nodes > node_idx && (ast->token.type != pattern_node[node_idx].token_type &&
 								 pattern_node[node_idx].token_type != TOKEN_TYPE_ANY &&
 								 pattern_node[node_idx].token_type != TOKEN_TYPE_FUNC &&
+								 pattern_node[node_idx].token_type != TOKEN_TYPE_CONST &&
 								 pattern_node[node_idx].is_inverted == 0) ||
 		(pattern_node[node_idx].has_number == 1 && ast->token.value.number != pattern_node[node_idx].number) ||
+		(pattern_node[node_idx].is_negative == 1 && ast->token.value.number >= 0) ||
 		(pattern_node[node_idx].token_type == TOKEN_TYPE_FUNC && !is_node_function(ast)) ||
+		(pattern_node[node_idx].token_type == TOKEN_TYPE_CONST && is_node_function(ast)) ||
 		(pattern_node[node_idx].is_inverted == 1 && ast->token.type == pattern_node[node_idx].token_type) ||
 		(pattern_node[node_idx].is_same == 1 && ast_nodes_are_equal(ast, ast_get_node_by_index(root, pattern_node[node_idx].equal_idx)) == false)) {
 		return false;

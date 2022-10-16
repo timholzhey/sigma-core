@@ -88,6 +88,9 @@ void debug_print_ast(ast_node_t *ast) {
 					log_debug_noterm("[%s] ", token_type_name_map[0]);
 				}
 			}
+			if (node->token.type >= TOKEN_TYPE_COUNT) {
+				return;
+			}
 			log_debug_noterm("[%s] ", token_type_name_map[node->token.type]);
 			lookahead = 0;
 		}

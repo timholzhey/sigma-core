@@ -178,9 +178,16 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 			if (do_match_number) {
 				do_match_number = false;
 				store_node->type = PATTERN_NODE_TYPE_MATCH_TOKEN;
-				store_node->has_number = 1;
 				tok_buf[tok_buf_pos] = '\0';
-				store_node->number = strtod(tok_buf, NULL);
+
+				if (memcmp(tok_buf, "NEG", 3) == 0) {
+					store_node->is_negative = 1;
+					store_node->has_number = 0;
+				} else {
+					store_node->number = strtod(tok_buf, NULL);
+					store_node->is_negative = 0;
+					store_node->has_number = 1;
+				}
 
 				if (do_capture) {
 					store_node->capture_idx = capture_index++;
@@ -194,7 +201,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				continue;
 			}
 
-			if (memcmp(tok_buf, "NUM", tok_buf_pos) == 0) {
+			if (memcmp(tok_buf, "NUM", tok_buf_pos > 3 ? tok_buf_pos : 3) == 0) {
 				if (do_capture || do_eval) {
 					if (rule[i] == '=') {
 						do_match_number = true;
@@ -224,7 +231,7 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 				continue;
 			}
 
-			if (memcmp(tok_buf, "ERR", tok_buf_pos) == 0) {
+			if (memcmp(tok_buf, "ERR", tok_buf_pos > 3 ? tok_buf_pos : 3) == 0) {
 				do_error = true;
 				tok_buf_pos = 0;
 				continue;
@@ -232,7 +239,8 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 
 			bool match_token = false;
 			for (int j = 0; j < TOKEN_TYPE_COUNT; j++) {
-				if (memcmp(tok_buf, token_type_name_map[j], tok_buf_pos) == 0) {
+				uint32_t token_len = strlen(token_type_name_map[j]);
+				if (memcmp(tok_buf, token_type_name_map[j], tok_buf_pos > token_len ? tok_buf_pos : token_len) == 0) {
 					store_node->token_type = j;
 					match_token = true;
 					break;
