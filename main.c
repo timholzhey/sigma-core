@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/time.h>
 #include "logging.h"
 #include "math_core.h"
 #include "io.h"
@@ -16,6 +17,10 @@
 bool g_verbose;
 
 int main(int argc, char **argv) {
+	struct timeval tv;
+	gettimeofday(&tv,NULL);
+	uint32_t time_at_start = 1000000 * tv.tv_sec + tv.tv_usec;
+
 	math_core_init();
 
 	char in_buf[INPUT_BUFFER_SIZE];
@@ -47,8 +52,13 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	printf("Sigma algebra engine v%d.%d.%d.\n"
-		   "Type \"help\" for more information and \"q\" to quit.\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+	gettimeofday(&tv,NULL);
+	uint32_t time_after_boot = 1000000 * tv.tv_sec + tv.tv_usec;
+	float boot_up_time_ms = (float) (time_after_boot - time_at_start) / 1000.0f;
+
+	printf("Sigma algebra engine v%d.%d.%d. (%.2f ms)\n"
+		   "Type \"help\" for more information and \"q\" to quit.\n",
+		   VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, boot_up_time_ms);
 
 	while (1) {
 		int ret = cli_get_line("> ", in_buf, INPUT_BUFFER_SIZE);
