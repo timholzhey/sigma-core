@@ -23,6 +23,9 @@ static bool ast_nodes_are_equal(ast_node_t *a, ast_node_t *b) {
 	if (a == NULL && b == NULL) {
 		return true;
 	}
+	if ((a && a->token.type == TOKEN_TYPE_NONE) || (b && b->token.type == TOKEN_TYPE_NONE)) {
+		return true;
+	}
 	if (a == NULL || b == NULL) {
 		return false;
 	}

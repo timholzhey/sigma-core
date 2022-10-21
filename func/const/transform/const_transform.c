@@ -34,9 +34,10 @@ void const_transform_init() {
 	pattern_registry_add_rule(&const_registry, "ADD_SAME_MULTIPLES", "ADD,MUL,MUL,(NUM),(?ANY),(NUM),(?ANY) > MUL,[ADD,$1,$3],$2");
 	pattern_registry_add_rule(&const_registry, "ADD_SAME", "ADD,(?ANY),(?ANY) > MUL,[NUM=2],$1");
 	pattern_registry_add_rule(&const_registry, "SUB_SAME", "SUB,(?ANY),(?ANY) > [NUM=0]");
-	pattern_registry_add_rule(&const_registry, "MUL_SAME", "MUL,(?ANY),(?ANY) > POW,$1,[NUM=2]");
 	pattern_registry_add_rule(&const_registry, "DIV_SAME", "~DIV,(?ANY),(?ANY) > [NUM=1]");
 	pattern_registry_add_rule(&const_registry, "MUL_SAME_POWERS", "MUL,POW,POW,(?ANY),(NUM),(?ANY),(NUM) > POW,$1,[ADD,$2,$4]");
+	pattern_registry_add_rule(&const_registry, "MUL_SAME_POWER", "MUL,POW,(?ANY),(?ANY),(NUM) > POW,$1,ADD,-,-,$3,[NUM=1]");
+	pattern_registry_add_rule(&const_registry, "MUL_SAME", "MUL,(?ANY),(?ANY) > POW,$1,[NUM=2]");
 	pattern_registry_add_rule(&const_registry, "ADD_SAME_PROD", "ADD,MUL,(?ANY),(NUM),(?ANY) > MUL,ADD,$1,$2,[NUM=1]");
 	pattern_registry_add_rule(&const_registry, "ADD_SAME_PROD2", "ADD,(?ANY),MUL,ANY,ANY,(NUM),(?ANY) > MUL,ADD,$1,$2,[NUM=1]");
 	pattern_registry_add_rule(&const_registry, "SUB_SAME_PROD", "~SUB,MUL,(?ANY),(NUM),(?ANY) > MUL,SUB,$1,$2,[NUM=1]");
