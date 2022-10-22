@@ -221,7 +221,7 @@ TEST_DEF(test_func_derive, e_raise_function) {
 	math_core_init();
 
 	const char *func = "e^(x+x^2)";
-	const char *expect_result = "e^(x+x^2)*2x+1";
+	const char *expect_result = "e^(x+x^2)*(2x+1)";
 
 	const char *result = math_function(func, 'x', MATH_FUNCTION_DERIVE);
 

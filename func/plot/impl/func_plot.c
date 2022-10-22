@@ -3,11 +3,10 @@
 //
 
 #include <string.h>
-#include "plot_ascii_graph.h"
+#include "func_plot.h"
 #include "math_core.h"
 #include "math_lang_def.h"
 #include "math_eval_const.h"
-#include "testlib.h"
 
 #define GRID_WIDTH		100
 #define GRID_HEIGHT		50
@@ -19,7 +18,7 @@
 
 static char grid[GRID_HEIGHT * GRID_WIDTH + 1];
 
-retval_t plot_ascii_graph(const char *input, char **output) {
+retval_t func_plot(const char *input, char **output) {
 	ast_node_t ast = {0};
 
 	// clear grid

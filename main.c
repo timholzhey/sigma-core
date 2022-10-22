@@ -14,7 +14,16 @@
 #define VERSION_MINOR			1
 #define VERSION_PATCH			0
 
-bool g_verbose;
+static void print_usage() {
+	log_info("Sigma algebra engine v%d.%d.%d.\n",
+			 VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+	log_info("Usage: sigma [options]");
+	log_info("Options:");
+	log_info("%-20sVerbose output", "   -v");
+	log_info("%-20sPrint version", "   --version");
+	log_info("%-20sCompile input", "   -c <input>");
+	log_info("%-20sPrint this help", "   -h");
+}
 
 int main(int argc, char **argv) {
 	struct timeval tv;
@@ -22,6 +31,10 @@ int main(int argc, char **argv) {
 	uint32_t time_at_start = 1000000 * tv.tv_sec + tv.tv_usec;
 
 	math_core_init();
+
+	gettimeofday(&tv,NULL);
+	uint32_t time_after_boot = 1000000 * tv.tv_sec + tv.tv_usec;
+	float boot_up_time_ms = (float) (time_after_boot - time_at_start) / 1000.0f;
 
 	char in_buf[INPUT_BUFFER_SIZE];
 	char out_buf[OUTPUT_BUFFER_SIZE];
@@ -43,21 +56,21 @@ int main(int argc, char **argv) {
 					log_error("Error compiling input");
 					return 1;
 				}
-				printf("%s\n", out_buf);
+				log_info("%s", out_buf);
+				return 0;
+			} else if (strcmp(*argv, "-h") == 0) {
+				print_usage();
 				return 0;
 			} else {
 				log_error("Unknown argument: %s", *argv);
+				print_usage();
 				return 1;
 			}
 		}
 	}
 
-	gettimeofday(&tv,NULL);
-	uint32_t time_after_boot = 1000000 * tv.tv_sec + tv.tv_usec;
-	float boot_up_time_ms = (float) (time_after_boot - time_at_start) / 1000.0f;
-
-	printf("Sigma algebra engine v%d.%d.%d. (%.2f ms)\n"
-		   "Type \"help\" for more information and \"q\" to quit.\n",
+	log_info("Sigma algebra engine v%d.%d.%d. (%.2f ms)\n"
+		   "Type \"help\" for more information and \"q\" to quit.",
 		   VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, boot_up_time_ms);
 
 	while (1) {
@@ -87,13 +100,15 @@ int main(int argc, char **argv) {
 		}
 
 		if (strcmp(in_buf, "help") == 0) {
-			log_info("%-35sShow this message", "help");
-			log_info("%-35sQuit the program", "q");
-			log_info("%-35sShow git repository", "repo");
-			log_info("%-35sShow version", "version");
-			log_info("%-35sToggle verbose mode", "verbose");
-			log_info("%-35sDerive a function (short: '<function>)", "derive[<function>(,<variable>)]");
-			log_info("%-35sEvaluate a constant expression (short: <function>)\n", "const[<function>]");
+			log_info("%-40sShow this message", "help");
+			log_info("%-40sQuit the program", "q");
+			log_info("%-40sShow git repository", "repo");
+			log_info("%-40sShow version", "version");
+			log_info("%-40sToggle verbose mode", "verbose");
+			log_info("%-40s------------", "------------");
+			log_info("%-40sDerive a function (short: der <function>)", "func_derive[<function>(,<variable>)]");
+			log_info("%-40sIntegrate a function (short: int <function>)", "func_integrate[<function>(,<variable>)]");
+			log_info("%-40sEvaluate a constant expression (short: <function>)\n", "func_const[<function>]");
 			continue;
 		}
 

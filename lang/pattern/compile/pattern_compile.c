@@ -166,6 +166,10 @@ retval_t pattern_compile(const char *rule, size_t rule_len, pattern_t *pattern) 
 
 		if ((rule[i] == ',' || (rule[i] == ' ' && !do_error) || rule[i] == '>' || rule[i] == ':' || (rule[i] == ')' && do_capture) ||
 			 (rule[i] == '=' && (do_capture || do_eval)) || i == rule_len - 1) && tok_buf_pos > 0) {
+			if (i == rule_len - 1) {
+				tok_buf[tok_buf_pos++] = rule[i];
+			}
+
 			pattern_nodes[*pattern_node_pos].type = PATTERN_NODE_TYPE_MATCH_TOKEN;
 			store_node->is_inverted = do_invert;
 			store_node->is_same = do_same;

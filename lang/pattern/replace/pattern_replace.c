@@ -56,6 +56,8 @@ static retval_t pattern_replace_node(pattern_node_t *pattern_nodes, int node_idx
 			ast->token.type = TOKEN_TYPE_ERR;
 			ast->token.value.identifier_len = node->error_desc_len;
 			memcpy(ast->token.value.identifier, node->error_desc, node->error_desc_len);
+			ast->left = NULL;
+			ast->right = NULL;
 			break;
 
 		default:

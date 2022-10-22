@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "func_derive.h"
+#include "func_integrate.h"
 #include "math_core.h"
 #include "math_lang_def.h"
 #include "math_lexer.h"
@@ -14,18 +15,23 @@
 #include "math_evaluator.h"
 #include "math_stringify.h"
 #include "func_const.h"
-#include "plot_ascii_graph.h"
+#include "func/plot/impl/func_plot.h"
 
 #define MAX_NUM_TOKENS 1000
 
 static bool module_initialized = false;
 
+bool g_verbose;
+
 void math_core_init() {
 	if (module_initialized) {
 		return;
 	}
+
 	func_derive_init();
+	func_integrate_init();
 	func_const_init();
+
 	module_initialized = true;
 }
 
@@ -111,7 +117,7 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 
 	if (sigma_func == MATH_FUNCTION_PLOT) {
 		char *output = NULL;
-		retval_t ret = plot_ascii_graph(func_str, &output);
+		retval_t ret = func_plot(func_str, &output);
 		return output;
 	}
 
@@ -184,6 +190,19 @@ const char *math_function(const char *func_str, char var, math_function_t sigma_
 	return string;
 }
 
-const char *derive(const char *func, char var) {
+// Function wrappers
+const char *math_derive(const char *func, char var) {
 	return math_function(func, var, MATH_FUNCTION_DERIVE);
+}
+
+const char *math_integrate(const char *func, char var) {
+	return math_function(func, var, MATH_FUNCTION_INTEGRATE);
+}
+
+const char *math_const(const char *func, char var) {
+	return math_function(func, var, MATH_FUNCTION_CONST);
+}
+
+const char *math_plot(const char *func, char var) {
+	return math_function(func, var, MATH_FUNCTION_PLOT);
 }

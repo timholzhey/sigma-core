@@ -137,6 +137,12 @@ retval_t lang_lex(const char *input, token_t *tokens, int *num_tokens, int max_n
 		// look ahead
 		buf[buf_pos++] = input[input_pos];
 
+		// ignore whitespace
+		if (buf[buf_pos - 1] == ' ' || buf[buf_pos - 1] == '\t') {
+			buf_pos--;
+			continue;
+		}
+
 		// check str repr
 		int num_matches = 0;
 		for (int i = 0; i < TOKEN_TYPE_COUNT; i++) {

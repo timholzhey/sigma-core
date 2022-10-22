@@ -11,7 +11,7 @@ void derive_transform_init() {
 	pattern_registry_add_rule(&derive_registry, "DIV_CONST_FUNC", "~@DIV,(CONST),(FUNC) > MUL,$1,*POW,-,-,$2,[NUM=-1]");
 	pattern_registry_add_rule(&derive_registry, "FUNC_PRODUCT", "@MUL,(FUNC),(FUNC) > ADD,MUL,MUL,$1,*$2,*$1,$2");
 	pattern_registry_add_rule(&derive_registry, "FUNC_QUOTIENT", "~@DIV,(FUNC),(FUNC) > DIV,SUB,POW,MUL,MUL,$2,[NUM=2],$2,*$1,$1,*$2");
-	pattern_registry_add_rule(&derive_registry, "FUNC_CHAIN_1", "@(FUNC),(FUNC) > MUL,*$1,*$2");
+	pattern_registry_add_rule(&derive_registry, "FUNC_CHAIN_1", "@(FUNC),(FUNC) > MUL,*$1,*$2"); // Fix e^(x^2+x)
 	pattern_registry_add_rule(&derive_registry, "FUNC_CHAIN_2", "@(FUNC),(!NUM),(FUNC) > MUL,*$1,*$3");
 
 	pattern_registry_add_rule(&derive_registry, "VAR", "VAR > [NUM=1]");

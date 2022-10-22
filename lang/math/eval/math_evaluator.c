@@ -5,6 +5,7 @@
 #include "math_evaluator.h"
 #include "logging.h"
 #include "func_derive.h"
+#include "func_integrate.h"
 #include "func_const.h"
 
 retval_t lang_eval(ast_node_t *ast_in, ast_node_t *ast_out, math_function_t func) {
@@ -12,6 +13,10 @@ retval_t lang_eval(ast_node_t *ast_in, ast_node_t *ast_out, math_function_t func
 		case MATH_FUNCTION_DERIVE:
 			log_debug("Running math function: derive");
 			return func_derive(ast_in, ast_out);
+
+		case MATH_FUNCTION_INTEGRATE:
+			log_debug("Running math function: integrate");
+			return func_integrate(ast_in, ast_out);
 
 		case MATH_FUNCTION_CONST:
 			log_debug("Running math function: const");

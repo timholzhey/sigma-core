@@ -159,7 +159,7 @@ TEST_DEF(test_stringify, simple_parentheses) {
 	TEST_ASSERT_EQ(err, PARSER_ERROR_OK);
 
 	char *string = NULL;
-	char *expect_string = "x+x2x";
+	char *expect_string = "x+xx";
 	int str_len = 0;
 
 	retval_t string_ret = lang_stringify(&ast, &string, &str_len);

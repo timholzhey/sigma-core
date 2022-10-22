@@ -7,12 +7,17 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/
 
         ${CMAKE_CURRENT_SOURCE_DIR}/func
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/impl
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/impl
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/transform
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/impl
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/transform
+        ${CMAKE_CURRENT_SOURCE_DIR}/plot/integrate
+        ${CMAKE_CURRENT_SOURCE_DIR}/plot/integrate/impl
 
         ${CMAKE_CURRENT_SOURCE_DIR}/core
 
@@ -47,7 +52,6 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/main.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/math_core.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/plot_ascii_graph.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/lexer/math_lexer.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/math/parser/math_parser.c
@@ -69,10 +73,13 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma/sigma_lang_def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/sigma/compile/sigma_compile.c
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl/func_derive.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/impl/func_const.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform/const_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/impl/func_derive.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/transform/derive_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/impl/func_integrate.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/transform/integrate_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/plot/impl/func_plot.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/util/io.c
 )

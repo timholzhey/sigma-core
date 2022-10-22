@@ -61,7 +61,7 @@ TEST_DEF(test_pattern, compile_simple) {
 }
 
 TEST_DEF(test_pattern, compile_simple2) {
-	const char *rule = "LOG,VAR > DIV,[NUM=1],VAR";
+	const char *rule = "LOG,VAR > DIV,[NUM=1],VAR,";
 	pattern_t pattern;
 
 	retval_t ret = pattern_compile(rule, strlen(rule), &pattern);

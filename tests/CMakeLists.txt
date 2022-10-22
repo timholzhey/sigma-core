@@ -19,10 +19,13 @@ add_executable(
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/capture/pattern_capture.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lang/pattern/generate/pattern_generate.c
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/impl/func_derive.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/func/deriv/transform/derive_transform.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/impl/func_const.c
         ${CMAKE_CURRENT_SOURCE_DIR}/func/const/transform/const_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/impl/func_derive.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/derive/transform/derive_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/impl/func_integrate.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/integrate/transform/integrate_transform.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/func/plot/impl/func_plot.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/testlib.c
 
