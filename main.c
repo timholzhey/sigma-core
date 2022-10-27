@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/time.h>
+#include <stdlib.h>
 #include "logging.h"
 #include "math_core.h"
 #include "io.h"
@@ -14,6 +15,8 @@
 #define VERSION_MINOR			1
 #define VERSION_PATCH			0
 
+#define PATH_TO_REPO			"PATH_TO_REPO"
+
 static void print_usage() {
 	log_info("Sigma algebra engine v%d.%d.%d.\n",
 			 VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
@@ -23,6 +26,7 @@ static void print_usage() {
 	log_info("%-20sPrint version", "   --version");
 	log_info("%-20sCompile input", "   -c <input>");
 	log_info("%-20sPrint this help", "   -h");
+	log_info("%-20sBuild from source", "   --build");
 }
 
 int main(int argc, char **argv) {
@@ -60,6 +64,12 @@ int main(int argc, char **argv) {
 				return 0;
 			} else if (strcmp(*argv, "-h") == 0) {
 				print_usage();
+				return 0;
+			} if (strcmp(*argv, "--build") == 0) {
+				char cmd[1024];
+				sprintf(cmd, "cmake --build %s/cmake-build-debug --target sigma_core -j 6", PATH_TO_REPO);
+				log_info("%s", cmd);
+				system(cmd);
 				return 0;
 			} else {
 				log_error("Unknown argument: %s", *argv);
